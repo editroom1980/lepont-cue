@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#08080a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="キューシート">
+<title>ル・ポン2026 カメラキュー</title>
+<style>
+:root{
+  --bg:#08080a; --panel:#141419; --panel2:#1c1c23; --line:#2b2b35;
+  --txt:#eceaf0; --sub:#9b99a8;
+  --us:#ff5f52; --bs:#ffb020; --ws:#4da3ff;
+  --accent:#ffb020;
+  --pad-t:0px; --pad-b:0px;
+  --pad-t:constant(safe-area-inset-top); --pad-b:constant(safe-area-inset-bottom);
+  --pad-t:env(safe-area-inset-top,0px); --pad-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--txt);
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  font-size:15px;line-height:1.5;overscroll-behavior:none;
+  -webkit-text-size-adjust:100%;
+  -webkit-font-feature-settings:"tnum";font-feature-settings:"tnum"}
+body.dim{filter:brightness(.42) saturate(.85)}
+button{font-family:inherit;color:inherit;border:none;background:none;cursor:pointer}
+
+.top{position:-webkit-sticky;position:sticky;top:0;z-index:20;background:rgba(8,8,10,.94);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);padding:calc(var(--pad-t) + 8px) 12px 8px}
+.top-row{display:flex;align-items:center;min-height:32px}
+.top-row > * + *{margin-left:8px}
+.back{font-size:15px;color:var(--accent);padding:4px 8px 4px 0;flex:0 0 auto}
+.top-title{font-size:14px;font-weight:700;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{font-size:12px;color:var(--sub);border:1px solid var(--line);
+  border-radius:7px;padding:5px 9px;flex:0 0 auto;background:var(--panel)}
+.iconbtn.on{color:#000;background:var(--accent);border-color:var(--accent);font-weight:700}
+
+.wrap{padding:12px 12px calc(var(--pad-b) + 28px)}
+.days{display:-ms-grid;display:grid;grid-template-columns:repeat(4,1fr);
+  grid-gap:6px;gap:6px;margin-bottom:14px}
+.day{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:9px 4px;text-align:center}
+.day.sel{background:var(--accent);border-color:var(--accent);color:#000}
+.day b{display:block;font-size:17px;line-height:1.2}
+.day span{font-size:10px;opacity:.75}
+.venue{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:11px 13px;margin-bottom:14px;font-size:13px}
+.venue .v1{font-weight:700;font-size:14px}
+.venue .v2{color:var(--sub);margin-top:3px;font-size:12px;line-height:1.6}
+.sect{font-size:11px;letter-spacing:.12em;color:var(--sub);margin:16px 0 8px}
+.pc > * + *{margin-left:11px}
+.pc{display:flex;align-items:flex-start;width:100%;text-align:left;
+  background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:12px;margin-bottom:8px}
+.pc:active{background:var(--panel2)}
+.pc .n{flex:0 0 26px;height:26px;border-radius:7px;background:var(--panel2);
+  color:var(--sub);font-size:13px;font-weight:700;display:flex;
+  align-items:center;justify-content:center;margin-top:1px}
+.pc .b{flex:1;min-width:0}
+.pc .cp{font-size:11px;color:var(--accent);font-weight:700}
+.pc .ti{font-size:15px;font-weight:700;margin:1px 0 4px;line-height:1.35}
+.pc .pl{font-size:11px;color:var(--sub);line-height:1.5}
+.pc .du{flex:0 0 auto;font-size:12px;color:var(--sub);
+  font-variant-numeric:tabular-nums;margin-top:3px}
+.rig{background:var(--panel);border:1px solid var(--line);border-radius:11px;
+  padding:13px;font-size:12.5px;line-height:1.7}
+.rig .r{display:flex;padding:7px 0;border-bottom:1px solid var(--line)}
+.rig .r > * + *{margin-left:9px}
+.rig .r:last-child{border-bottom:none}
+.rig .r b{flex:0 0 80px;color:var(--accent);font-size:12px}
+.oflag{display:block;width:100%;text-align:left;border-radius:10px;padding:11px 13px;
+  margin-bottom:12px;font-size:12.5px;line-height:1.6;border:1px solid var(--line);
+  background:var(--panel);color:var(--sub)}
+.oflag b{display:block;font-size:13.5px;margin-bottom:2px}
+.oflag.ok{border-color:#3ddc84;background:#0e2318}.oflag.ok b{color:#3ddc84}
+.oflag.ng{border-color:#ff8a3d;background:#2a1a0c}.oflag.ng b{color:#ff8a3d}
+.foot{color:#66646f;font-size:11.5px;line-height:1.75;margin-top:18px}
+
+.cuepage{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+.meta{padding:8px 12px 0}
+.meta .mv{font-size:12px;color:var(--accent);font-weight:700;line-height:1.5}
+.meta .memo{font-size:11.5px;color:var(--sub);line-height:1.6;margin-top:5px;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
+.clock{padding:10px 12px 5px;display:flex;align-items:baseline}
+.clock > * + *{margin-left:10px}
+.clock .big{font-size:46px;font-weight:800;letter-spacing:-.02em;
+  font-variant-numeric:tabular-nums;line-height:1}
+.clock .tot{font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+.clock .st{margin-left:auto;font-size:11px;color:var(--sub);
+  border:1px solid var(--line);border-radius:6px;padding:3px 7px}
+.clock .st.run{color:#000;background:#3ddc84;border-color:#3ddc84;font-weight:700}
+.bar{height:4px;background:var(--panel2);margin:0 12px;border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);width:0}
+
+.now{margin:12px;border-radius:14px;border:2px solid var(--line);
+  background:var(--panel);padding:15px;position:relative;overflow:hidden}
+.now::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--line)}
+.now.us{border-color:var(--us)} .now.us::before{background:var(--us)}
+.now.bs{border-color:var(--bs)} .now.bs::before{background:var(--bs)}
+.now.ws{border-color:var(--ws)} .now.ws::before{background:var(--ws)}
+.now .hd{display:flex;align-items:center;margin-bottom:8px}
+.now .hd > * + *{margin-left:8px}
+.shot{font-size:12px;font-weight:800;padding:4px 10px;border-radius:7px;color:#000;
+  background:var(--line)}
+.shot.us{background:var(--us)} .shot.bs{background:var(--bs)} .shot.ws{background:var(--ws)}
+.now .at{font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums}
+.now .who{font-size:29px;font-weight:800;line-height:1.25;letter-spacing:-.01em}
+.now .nt{font-size:14px;color:#cfccd8;margin-top:8px;line-height:1.55}
+
+.next{margin:0 12px 10px;border-radius:12px;background:var(--panel);
+  border:1px dashed var(--line);padding:11px 13px;display:flex;align-items:center}
+.next > * + *{margin-left:10px}
+.next.soon{border-style:solid;border-color:var(--accent);background:#241d0c}
+.next .cd{flex:0 0 auto;font-size:18px;font-weight:800;color:var(--accent);
+  font-variant-numeric:tabular-nums;min-width:58px}
+.next .tx{flex:1;min-width:0;font-size:13px;line-height:1.4}
+.next .tx b{font-size:14.5px}
+.next .tx span{color:var(--sub);font-size:11.5px;display:block;margin-top:2px}
+
+.ctl{margin-top:auto;position:-webkit-sticky;position:sticky;bottom:0;background:rgba(8,8,10,.96);
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  border-top:1px solid var(--line);padding:9px 10px calc(var(--pad-b) + 9px)}
+.ctl .row{display:flex;margin-bottom:7px}
+.ctl .row > * + *{margin-left:7px}
+.ctl .row:last-child{margin-bottom:0}
+.btn{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+  padding:13px 4px;font-size:14px;font-weight:700;text-align:center}
+.btn:active{background:#2f2f3a}
+.btn.sm{font-size:12.5px;padding:11px 4px;font-weight:600;color:var(--sub)}
+.btn.go{background:#3ddc84;border-color:#3ddc84;color:#000;flex:2}
+.btn.stop{background:#ff8a3d;border-color:#ff8a3d;color:#000;flex:2}
+.btn.key{color:var(--accent);border-color:#4a3d18}
+
+.list{padding:0 12px 12px}
+.li > * + *{margin-left:9px}
+.li{display:flex;align-items:flex-start;width:100%;text-align:left;
+  padding:9px 10px;border-radius:9px;margin-bottom:5px;
+  background:var(--panel);border:1px solid transparent}
+.li.past{opacity:.38}
+.li.cur{border-color:var(--accent);background:#211c10}
+.li .t{flex:0 0 46px;font-size:12.5px;color:var(--sub);
+  font-variant-numeric:tabular-nums;padding-top:2px}
+.li .dot{flex:0 0 7px;height:7px;border-radius:50%;margin-top:7px}
+.li .c{flex:1;min-width:0}
+.li .c b{font-size:14px;font-weight:700}
+.li .c i{font-style:normal;font-size:11px;color:var(--sub);display:block;
+  line-height:1.45;margin-top:2px}
+.up{padding:2px 12px 10px}
+.up .h{font-size:10.5px;letter-spacing:.12em;color:var(--sub);margin:4px 0 7px}
+.up .r > * + *{margin-left:9px}
+.up .r{display:flex;align-items:flex-start;padding:8px 10px;border-radius:9px;
+  background:var(--panel);margin-bottom:5px;opacity:.85}
+.up .r .t{flex:0 0 42px;font-size:12px;color:var(--sub);font-variant-numeric:tabular-nums;padding-top:1px}
+.up .r .dot{flex:0 0 7px;height:7px;border-radius:50%;margin-top:6px}
+.up .r .c{flex:1;min-width:0}
+.up .r .c b{font-size:13.5px}
+.up .r .c i{font-style:normal;font-size:11px;color:var(--sub);display:block;line-height:1.4;margin-top:1px}
+.mvhdr{font-size:11px;letter-spacing:.1em;color:var(--accent);
+  margin:14px 0 7px;padding-left:2px;font-weight:700}
+@media (max-width:380px){
+  .now .who{font-size:25px}
+  .clock .big{font-size:40px}
+  .btn{font-size:13px;padding:12px 2px}
+  .btn.sm{font-size:11.5px;padding:10px 2px}
+  .ctl .row > * + *{margin-left:5px}
+  .next .cd{font-size:16px;min-width:50px}
+  .pc .ti{font-size:14px}
+  .rig .r b{flex:0 0 68px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+var DATA = [
+{
+  date:"9/16", dow:"水", venue:"姫路城二の丸 特設会場", start:"19:00", open:"18:15",
+  note:"雨天時はアクリエひめじ 中ホールに変更。屋外のため風・虫・照明の変化に注意。",
+  pieces:[
+    {
+      composer:"ツェムリンスキー", title:"2本のホルンとピアノのための狩りの小品",
+      players:"ヴラトコヴィチ(Hr)／バボラーク(Hr)／ル・サージュ(Pf)", dur:230,
+      memo:"開演1曲目。まず編成が分かる引きから入る。ホルン2本は並んで立つ可能性が高い。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"ホルン2本","WS","冒頭の狩りのファンファーレ。2本ユニゾンを1画面に"],
+        [35,"バボラーク(Hr)","BS","上声部が主導。ベルの向きに注意"],
+        [70,"ヴラトコヴィチ(Hr)","BS","下声部の応答・エコー"],
+        [105,"ル・サージュ(Pf)","BS","間奏。手元を狙う"],
+        [135,"ホルン2本","WS","主題再現、掛け合い"],
+        [180,"バボラーク(Hr)","US","高音の見せ場"],
+        [210,"3人","WS","コーダ〜終止。余韻と拍手まで保持"]
+      ]
+    },
+    {
+      composer:"リスト", title:"悲哀 ― オーベルマンの谷 S.378c",
+      players:"ブロフツィン(Vn)／プレッサー(Vc)／バックス(Pf)", dur:840,
+      memo:"単一楽章の長い曲。静と激の落差が大きい。寄りすぎると激情部で見失うのでBS基準。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"バックス(Pf)","BS","低音のうねる序奏。手元から"],
+        [45,"プレッサー(Vc)","US","第1主題の提示。暗く沈んだ歌"],
+        [120,"ブロフツィン(Vn)","US","主題を受け継ぐ"],
+        [195,"Vn＋Vc","WS","弦の二重奏に"],
+        [270,"バックス(Pf)","BS","ピアノのレチタティーヴォ／独奏部"],
+        [360,"ブロフツィン(Vn)","US","激情部への入り。弓圧の強い動き"],
+        [450,"3人","WS","総奏の高まり"],
+        [540,"プレッサー(Vc)","US","長調に転じる歌"],
+        [630,"バックス(Pf)","BS","クライマックスのオクターヴ"],
+        [720,"ブロフツィン(Vn)","US","主題が戻る。寄りのまま保持"],
+        [780,"3人","WS","消えゆくコーダ"]
+      ]
+    },
+    {
+      composer:"モーツァルト", title:"音楽の冗談 K.522",
+      players:"ロメイコ(Vn1)／樫本(Vn2)／ラ・マルカ(Va)／シェハタ(Cb)／バボラーク(Hr)／ヴラトコヴィチ(Hr)", dur:1020,
+      memo:"★わざと間違える冗談曲。音の破綻と同時に奏者の表情が最大の見どころ。笑いが起きた瞬間は引きで客席も。",
+      movs:[["I. アレグロ",0],["II. メヌエット",240],["III. アダージョ",480],["IV. プレスト",780]],
+      cues:[
+        [0,"全員","WS","冒頭主題。6人の編成を見せる"],
+        [30,"ロメイコ(Vn1)","BS","第1ヴァイオリン主導"],
+        [70,"ホルン2本","WS","ぎこちない合いの手。表情に注目"],
+        [110,"樫本(Vn2)＋ラ・マルカ(Va)","WS","内声の掛け合い"],
+        [150,"ロメイコ(Vn1)","US","展開部。ぎくしゃくした音型"],
+        [200,"全員","WS","唐突な終止。奏者の表情まで入れる"],
+        [240,"全員","WS","メヌエット主題"],
+        [280,"ロメイコ(Vn1)","BS","旋律を担当。バストで弓と表情を"],
+        [330,"ホルン2本","WS","★トリオ＝最大の見せ場。わざと外す音。必ず2本を1画面に"],
+        [400,"ヴラトコヴィチ(Hr)","US","破綻していく下声部"],
+        [440,"全員","WS","メヌエット再現"],
+        [480,"ロメイコ(Vn1)","BS","甘い旋律。左手のヴィブラートを見せる"],
+        [540,"シェハタ(Cb)＋ラ・マルカ(Va)","WS","伴奏の刻み。低音側の動きを見せる"],
+        [585,"ロメイコ(Vn1)","US","装飾の多い歌"],
+        [640,"ロメイコ(Vn1)","US","★カデンツァ開始。全音階でずり上がる大ネタ。最後まで切らない"],
+        [720,"ロメイコ(Vn1)","US","カデンツァ終結。収まらない高音"],
+        [750,"全員","WS","楽章の終止。引きで次の楽章の構えへ"],
+        [780,"全員","WS","快速のフィナーレ主題"],
+        [820,"ロメイコ(Vn1)","BS","主題の提示。バストで安定させる"],
+        [860,"樫本(Vn2)","BS","フガートの応答"],
+        [900,"ラ・マルカ(Va)→シェハタ(Cb)","WS","低声が主題を追う。パンで受け渡す"],
+        [940,"ホルン2本","WS","崩れていく和音"],
+        [980,"全員","WS","★ラストの多調和音。引きで6人＋客席の反応まで。拍手まで回す"]
+      ]
+    },
+    {
+      composer:"ボッテジーニ", title:"クラリネットとコントラバスのための二重奏曲",
+      players:"メイエ(Cl)／シェハタ(Cb)／ル・サージュ(Pf)", dur:540,
+      memo:"コントラバスの超絶技巧が主眼。左手のポジション移動と弓の返しを積極的に抜く。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"ル・サージュ(Pf)","BS","序奏。手元から入る"],
+        [40,"シェハタ(Cb)","US","コントラバスの第1主題。左手のポジション移動を見せる"],
+        [100,"メイエ(Cl)","US","クラリネットが受ける"],
+        [150,"Cl＋Cb","WS","二重奏の掛け合い"],
+        [210,"シェハタ(Cb)","US","ハーモニクス／高音域の技巧"],
+        [270,"メイエ(Cl)","BS","カンタービレ"],
+        [330,"Cl＋Cb","WS","変奏で2本が絡む。2ショットで"],
+        [390,"シェハタ(Cb)","US","急速なパッセージ。弓と左手"],
+        [450,"メイエ(Cl)","US","高音のフレーズ"],
+        [495,"3人","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"ラフマニノフ", title:"ピアノ三重奏曲 第1番 ト短調「悲しみの三重奏曲」",
+      players:"樫本(Vn)／チャウシャン(Vc)／バックス(Pf)", dur:840,
+      memo:"単一楽章。ピアノのオスティナートで始まり葬送行進曲で終わる。終結は音が消えるまで動かさない。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"バックス(Pf)","BS","ピアノの低音オスティナート"],
+        [30,"チャウシャン(Vc)","US","第1主題＝悲歌の提示"],
+        [90,"樫本(Vn)","US","ヴァイオリンが主題を継ぐ"],
+        [150,"Vn＋Vc","WS","弦の二重奏。2人を1画面に"],
+        [210,"バックス(Pf)","BS","第1変奏。細かい音型"],
+        [280,"樫本(Vn)","US","第2主題の歌"],
+        [350,"チャウシャン(Vc)","US","低弦の朗々とした歌"],
+        [420,"3人","WS","変奏が重なる中間部"],
+        [500,"バックス(Pf)","BS","激しい和音の連打"],
+        [580,"樫本(Vn)","US","高揚するヴァイオリン"],
+        [660,"3人","WS","クライマックス総奏"],
+        [720,"チャウシャン(Vc)","US","葬送行進曲のコーダ"],
+        [790,"バックス(Pf)","BS","消えていく最後の和音"]
+      ]
+    },
+    {
+      composer:"ドホナーニ", title:"弦楽六重奏曲 変ロ長調 W080",
+      players:"ブロフツィン(Vn1)／樫本(Vn2)／ベルトー(Va1)／ラ・マルカ(Va2)／チャウシャン(Vc1)／プレッサー(Vc2)", dur:1980,
+      memo:"前半の締め。6人は横に広いのでFX3は必ず全員入る画角で。楽章構成は目安、実演で前後する前提で手動同期を使う。",
+      movs:[["I. アレグロ",0],["II. スケルツォ",660],["III. アダージョ",1020],["IV. フィナーレ",1500]],
+      cues:[
+        [0,"全員","WS","冒頭。6人の厚みを見せる"],
+        [40,"ブロフツィン(Vn1)","BS","第1主題の提示。バストで"],
+        [110,"チャウシャン(Vc1)","US","チェロの対旋律"],
+        [180,"樫本(Vn2)＋ベルトー(Va1)","WS","内声が動く。2人が入る画角で"],
+        [250,"ブロフツィン(Vn1)","US","第2主題の歌"],
+        [330,"全員","WS","展開部の総奏"],
+        [420,"プレッサー(Vc2)＋ラ・マルカ(Va2)","WS","低声の対位。2人を1画面に"],
+        [510,"ブロフツィン(Vn1)","BS","再現部。主題が戻る"],
+        [600,"全員","WS","コーダ。引きに構え、終止まで動かさない"],
+        [660,"全員","WS","スケルツォ主題"],
+        [700,"ブロフツィン(Vn1)＋樫本(Vn2)","WS","ヴァイオリン2本の刻み"],
+        [760,"ベルトー(Va1)","US","ヴィオラの主題"],
+        [820,"全員","WS","トリオに入る。編成が変わるので引きで確認"],
+        [880,"チャウシャン(Vc1)","US","トリオの歌。寄りで表情を"],
+        [950,"全員","WS","スケルツォ再現"],
+        [1020,"チャウシャン(Vc1)","US","アダージョ冒頭の歌"],
+        [1110,"ブロフツィン(Vn1)","US","ヴァイオリンが受ける"],
+        [1200,"ベルトー(Va1)＋ラ・マルカ(Va2)","WS","ヴィオラ2本の和声"],
+        [1290,"全員","WS","全体が高まる。引きで厚みを出す"],
+        [1380,"ブロフツィン(Vn1)","US","静かに主題が戻る。寄りのまま"],
+        [1450,"全員","WS","楽章の終止。引きで次の楽章の構えへ"],
+        [1500,"全員","WS","フィナーレ主題"],
+        [1550,"ブロフツィン(Vn1)","BS","主題の提示。バストで安定させる"],
+        [1620,"樫本(Vn2)","BS","前のフレーズへの応答。バストで"],
+        [1690,"チャウシャン(Vc1)＋プレッサー(Vc2)","WS","チェロ2本の推進"],
+        [1770,"全員","WS","総奏。全員が入る引きへ戻す"],
+        [1840,"ブロフツィン(Vn1)","US","最後の見せ場"],
+        [1910,"全員","WS","コーダ〜終演。引きで拍手まで"]
+      ]
+    }
+  ]
+},
+{
+  date:"9/17", dow:"木", venue:"アクリエひめじ 大ホール", start:"19:00", open:"18:15",
+  note:"ホール公演。客席込みの広角は舞台左から。照明が安定するのでFX6は露出固定でよい。",
+  pieces:[
+    {
+      composer:"シュポア", title:"ダンツィの主題による幻想曲と変奏曲 Op.81",
+      players:"メイエ(Cl)／樫本(Vn)／ロメイコ(Vn)／ベルトー(Va)／チャウシャン(Vc)／シェハタ(Cb)", dur:900,
+      memo:"終始クラリネットが主役。弦は伴奏と変奏ごとの受け渡し。迷ったらメイエに戻る。",
+      movs:[["序奏〜主題と変奏",0]],
+      cues:[
+        [0,"全員","WS","序奏アダージョ。編成を見せる"],
+        [40,"メイエ(Cl)","US","クラリネットの序奏フレーズ"],
+        [120,"メイエ(Cl)","BS","ダンツィの主題を提示"],
+        [200,"メイエ(Cl)","US","第1変奏。細かい装飾"],
+        [280,"樫本(Vn)＋ロメイコ(Vn)","WS","弦への受け渡し"],
+        [340,"メイエ(Cl)","US","第2変奏。跳躍の多い技巧"],
+        [420,"チャウシャン(Vc)＋シェハタ(Cb)","WS","低弦の刻み。弓元を見せる"],
+        [470,"メイエ(Cl)","US","短調の変奏。低音域の表情"],
+        [560,"ベルトー(Va)","BS","ヴィオラの対旋律"],
+        [610,"メイエ(Cl)","US","華やかな変奏"],
+        [700,"全員","WS","総奏。全員が入る引きへ戻す"],
+        [760,"メイエ(Cl)","US","フィナーレの技巧的パッセージ"],
+        [840,"全員","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"サン＝サーンス", title:"ホルンとオルガンのためのアダージョとアンダンテ",
+      players:"バボラーク(Hr)／ル・サージュ(Pf)", dur:420,
+      memo:"2人だけの静かな曲。ブレスの位置が絵になる。長い音は切れた後も3秒保持。",
+      movs:[["アダージョ",0],["アンダンテ",210]],
+      cues:[
+        [0,"ル・サージュ(Pf)","BS","静かな序奏。手元から入る"],
+        [30,"バボラーク(Hr)","US","ホルンの第1主題。息づかいが見える寄り"],
+        [100,"バボラーク(Hr)","BS","音域が上がる。ベル周りも入れる"],
+        [170,"ル・サージュ(Pf)","BS","間奏。手元を大きく"],
+        [210,"バボラーク(Hr)","US","アンダンテの歌"],
+        [290,"2人","WS","2人の対話。2ショットで受ける"],
+        [350,"バボラーク(Hr)","US","最後の長い音。切らずに余韻まで"],
+        [400,"2人","WS","終止。引きのまま余韻を残す"]
+      ]
+    },
+    {
+      composer:"ショパン", title:"ピアノ三重奏曲 ト短調 Op.8",
+      players:"ブロフツィン(Vn)／チャウシャン(Vc)／バックス(Pf)", dur:1680,
+      memo:"★チェロに旋律が多い曲。ヴァイオリンは高音域主体で出番が限定的。迷ったらチェロ。第3楽章冒頭のチェロは絶対に外さない。",
+      movs:[["I. アレグロ・コン・フオーコ",0],["II. スケルツォ",660],["III. アダージョ・ソステヌート",960],["IV. フィナーレ",1260]],
+      cues:[
+        [0,"バックス(Pf)","BS","力強い序奏。手元と上体を入れる"],
+        [40,"チャウシャン(Vc)","US","チェロの第1主題"],
+        [110,"ブロフツィン(Vn)","US","ヴァイオリンが受ける"],
+        [180,"バックス(Pf)","BS","ピアノのパッセージ"],
+        [250,"チャウシャン(Vc)","US","第2主題の歌"],
+        [330,"3人","WS","展開部。担当が細かく入れ替わるので引きで受ける"],
+        [420,"バックス(Pf)","BS","華麗な走句。手元を大きく"],
+        [500,"ブロフツィン(Vn)","US","再現部。主題が戻る"],
+        [580,"3人","WS","コーダ。引きに構え、終止まで動かさない"],
+        [660,"バックス(Pf)","BS","スケルツォ主題"],
+        [710,"ブロフツィン(Vn)","BS","跳ねる音型。弓の動きが見える寄りで"],
+        [770,"チャウシャン(Vc)","US","トリオの歌。寄りで表情を"],
+        [840,"3人","WS","主題の再現。引きで全体を受ける"],
+        [910,"バックス(Pf)","BS","終結部。引きで全体を"],
+        [960,"チャウシャン(Vc)","US","★冒頭の長い歌。この曲最大の聴かせどころ"],
+        [1050,"ブロフツィン(Vn)","US","ヴァイオリンの応答"],
+        [1130,"バックス(Pf)","BS","ピアノの装飾"],
+        [1190,"3人","WS","静かな終止。音が消えても3秒は保持"],
+        [1260,"バックス(Pf)","BS","マズルカ風の主題"],
+        [1310,"ブロフツィン(Vn)","BS","ヴァイオリンの主題"],
+        [1370,"チャウシャン(Vc)","US","チェロの副主題"],
+        [1440,"3人","WS","総奏。全員が入る引きへ戻す"],
+        [1520,"バックス(Pf)","BS","速い走句。手元に寄る"],
+        [1580,"ブロフツィン(Vn)","US","最後の高揚。寄りのまま押し切る"],
+        [1640,"3人","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"クライスラー", title:"弦楽四重奏曲 イ短調",
+      players:"樫本(Vn1)／ブロフツィン(Vn2)／ラ・マルカ(Va)／プレッサー(Vc)", dur:1680,
+      memo:"ウィーン情緒の濃い曲。第3楽章ロマンツェの樫本は寄りでポルタメントの左手を見せたい。",
+      movs:[["I. ファンタジア",0],["II. スケルツォ",540],["III. 序奏とロマンツェ",840],["IV. フィナーレ",1260]],
+      cues:[
+        [0,"全員","WS","重々しい序奏"],
+        [50,"ラ・マルカ(Va)","US","ヴィオラの主題提示"],
+        [110,"樫本(Vn1)","US","第1ヴァイオリンの第1主題"],
+        [190,"プレッサー(Vc)","US","チェロの対旋律"],
+        [260,"樫本(Vn1)","BS","第2主題。ウィーン風の歌"],
+        [340,"全員","WS","展開部。担当が細かく入れ替わるので引きで受ける"],
+        [420,"ブロフツィン(Vn2)","BS","内声が動く。2人が入る画角で"],
+        [480,"全員","WS","終結部。引きで全体を"],
+        [540,"全員","WS","スケルツォ主題"],
+        [590,"樫本(Vn1)","BS","跳ねる音型。弓の動きが見える寄りで"],
+        [650,"ラ・マルカ(Va)＋プレッサー(Vc)","WS","内声・低声の刻み"],
+        [710,"樫本(Vn1)","US","トリオの歌。寄りで表情を"],
+        [780,"全員","WS","主題の再現。引きで全体を受ける"],
+        [840,"プレッサー(Vc)","US","序奏の低音。弓元から入る"],
+        [900,"樫本(Vn1)","US","★ロマンツェの主題。甘美な歌。左手を見せる"],
+        [1000,"ブロフツィン(Vn2)","BS","第2ヴァイオリンの応答"],
+        [1070,"ラ・マルカ(Va)","US","ヴィオラの歌"],
+        [1140,"樫本(Vn1)","US","主題が戻る。寄りのまま保持"],
+        [1210,"全員","WS","楽章の終止。引きで次の楽章の構えへ"],
+        [1260,"全員","WS","フィナーレ主題"],
+        [1310,"樫本(Vn1)","BS","主題の提示。バストで安定させる"],
+        [1380,"ブロフツィン(Vn2)","BS","前のフレーズへの応答。バストで"],
+        [1440,"プレッサー(Vc)","US","低音が全体を推進。弓の動きを見せる"],
+        [1510,"樫本(Vn1)","US","技巧的な見せ場"],
+        [1580,"全員","WS","総奏。全員が入る引きへ戻す"],
+        [1640,"全員","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"シュポア", title:"八重奏曲 ホ長調 Op.32",
+      players:"ロメイコ(Vn)／ラ・マルカ(Va)／ベルトー(Va)／プレッサー(Vc)／シェハタ(Cb)／メイエ(Cl)／バボラーク(Hr)／ヴラトコヴィチ(Hr)", dur:1920,
+      memo:"8人編成で横に広い。FX3は8人全員が入る画角で固定。★第3楽章はヘンデル「調子の良い鍛冶屋」の変奏曲で、変奏ごとに主役が替わる最大の見せ場。",
+      movs:[["I. アダージョ〜アレグロ",0],["II. メヌエット",600],["III. 主題と変奏",900],["IV. フィナーレ",1440]],
+      cues:[
+        [0,"全員","WS","序奏アダージョ。8人を1画面に"],
+        [50,"メイエ(Cl)","US","クラリネットの序奏フレーズ"],
+        [110,"ロメイコ(Vn)","US","アレグロ主題"],
+        [180,"メイエ(Cl)","BS","クラリネットの応答"],
+        [250,"ホルン2本","WS","ホルン2本の和音"],
+        [310,"ロメイコ(Vn)","BS","第2主題。歌う部分なのでバストで"],
+        [380,"全員","WS","展開部。担当が細かく入れ替わるので引きで受ける"],
+        [460,"ラ・マルカ(Va)＋ベルトー(Va)","WS","ヴィオラ2本の内声"],
+        [530,"全員","WS","コーダ。引きに構え、終止まで動かさない"],
+        [600,"全員","WS","メヌエット主題"],
+        [650,"ロメイコ(Vn)","BS","旋律を担当。バストで弓と表情を"],
+        [710,"バボラーク(Hr)","US","ホルンの合いの手"],
+        [770,"メイエ(Cl)","US","トリオの歌。寄りで表情を"],
+        [840,"全員","WS","主題の再現。引きで全体を受ける"],
+        [900,"全員","WS","★ヘンデルの主題を提示"],
+        [950,"ロメイコ(Vn)","US","第1変奏。装飾が増える"],
+        [1020,"メイエ(Cl)","US","クラリネットの変奏"],
+        [1090,"プレッサー(Vc)＋シェハタ(Cb)","WS","低弦の変奏。2人を1画面に"],
+        [1160,"ホルン2本","WS","ホルンの変奏"],
+        [1230,"ラ・マルカ(Va)","US","ヴィオラの変奏"],
+        [1300,"ロメイコ(Vn)","US","技巧的な最終変奏"],
+        [1380,"全員","WS","楽章の終結。引きで受けて次に備える"],
+        [1440,"全員","WS","フィナーレ主題"],
+        [1490,"ロメイコ(Vn)","BS","主題の提示。バストで安定させる"],
+        [1560,"メイエ(Cl)","BS","クラリネットの走句"],
+        [1630,"ホルン2本","WS","ホルンのファンファーレ"],
+        [1700,"ロメイコ(Vn)","US","高音の見せ場"],
+        [1770,"全員","WS","総奏。全員が入る引きへ戻す"],
+        [1840,"全員","WS","コーダ〜終演。拍手・カーテンコールまで"]
+      ]
+    }
+  ]
+},
+{
+  date:"9/19", dow:"土", venue:"姫路城二の丸 特設会場", start:"19:00", open:"18:15",
+  note:"雨天時はアクリエひめじ 中ホールに変更。ペンデレツキの静寂部は屋外ノイズに注意。",
+  pieces:[
+    {
+      composer:"ベートーヴェン", title:"6つのレントラー WoO 15",
+      players:"樫本(Vn1)／ブロフツィン(Vn2)／シェハタ(Cb)", dur:300,
+      memo:"短い舞曲6つ。1曲ごとに区切りがあるので、曲の切れ目で狙いを替える。",
+      movs:[["6つの舞曲",0]],
+      cues:[
+        [0,"3人","WS","第1曲。まず編成を見せる"],
+        [50,"樫本(Vn1)","BS","第2曲。旋律"],
+        [100,"ブロフツィン(Vn2)","BS","第3曲。第2ヴァイオリンの動き"],
+        [150,"樫本(Vn1)＋ブロフツィン(Vn2)","WS","第4曲。2本の絡み"],
+        [200,"シェハタ(Cb)","BS","第5曲。低音の刻み"],
+        [250,"3人","WS","第6曲〜終結"]
+      ]
+    },
+    {
+      composer:"ドラゴネッティ", title:"チェロとコントラバスのための二重奏曲",
+      players:"プレッサー(Vc)／シェハタ(Cb)", dur:480,
+      memo:"低弦2本だけ。楽器の大きさの対比が絵になるので、引きと寄りを大きく振る。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"2人","WS","冒頭。2人の対比を見せる"],
+        [40,"シェハタ(Cb)","US","コントラバスの主題"],
+        [100,"プレッサー(Vc)","US","チェロが受ける"],
+        [160,"2人","WS","2人の掛け合い。2ショットで"],
+        [220,"シェハタ(Cb)","US","技巧的なパッセージ。左手を見せる"],
+        [280,"プレッサー(Vc)","US","歌う中間部。表情に寄る"],
+        [340,"2人","WS","2本が重なる後半。引きで両方を"],
+        [400,"シェハタ(Cb)","US","最後の見せ場"],
+        [440,"2人","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"ペンデレツキ", title:"六重奏曲",
+      players:"ロメイコ(Vn)／ラ・マルカ(Va)／チャウシャン(Vc)／メイエ(Cl)／ヴラトコヴィチ(Hr)／ル・サージュ(Pf)", dur:2100,
+      memo:"★現代作品。急な強弱変化と長い休符がある。特殊奏法の手元を積極的に。★第2楽章終盤の長大なホルン独奏が最大の山場（ヴラトコヴィチのために書かれた部分）。ここは絶対に外さない。",
+      movs:[["I. アレグロ・モデラート",0],["II. ラルゲット",1020]],
+      cues:[
+        [0,"全員","WS","冒頭の強打。全員が入る引きで"],
+        [50,"ル・サージュ(Pf)","BS","ピアノの刻み。手元"],
+        [120,"メイエ(Cl)","US","クラリネットの動機"],
+        [200,"ロメイコ(Vn)","US","鋭いヴァイオリン"],
+        [280,"チャウシャン(Vc)","US","低音の唸り。弓圧が見える寄りで"],
+        [360,"ヴラトコヴィチ(Hr)","US","ホルンの第1の呼びかけ"],
+        [440,"全員","WS","総奏の爆発。全員が入る引きへ"],
+        [520,"ラ・マルカ(Va)","US","ヴィオラの独白"],
+        [600,"ル・サージュ(Pf)","BS","ピアノの激しい和音"],
+        [680,"弦3人","WS","弦楽器の重なり"],
+        [760,"メイエ(Cl)","US","クラリネットの高音"],
+        [840,"全員","WS","クライマックス"],
+        [930,"ロメイコ(Vn)","US","静まる終結部"],
+        [1020,"全員","WS","第2楽章。静かな開始。引きで空気を撮る"],
+        [1100,"チャウシャン(Vc)","US","チェロの歌。弓と左手が入る寄りで"],
+        [1190,"ロメイコ(Vn)","US","ヴァイオリンの応答"],
+        [1280,"メイエ(Cl)","US","クラリネットの長いフレーズ"],
+        [1370,"ル・サージュ(Pf)","BS","ピアノの点描"],
+        [1460,"ラ・マルカ(Va)","US","ヴィオラの中間部"],
+        [1550,"全員","WS","全体が高まる。引きで厚みを出す"],
+        [1640,"チャウシャン(Vc)","US","低音の持続音。動かさずに保持"],
+        [1730,"ヴラトコヴィチ(Hr)","US","★ホルンの大独奏開始。ここから終曲までホルン中心。息を吸う瞬間も入れる"],
+        [1860,"ヴラトコヴィチ(Hr)","BS","独奏の頂点。バストで安定させる"],
+        [1950,"全員","WS","弦が戻る。引きで全体"],
+        [2030,"ヴラトコヴィチ(Hr)","US","最後の消えゆくホルン。音が切れても3秒は保持"]
+      ]
+    },
+    {
+      composer:"ベートーヴェン", title:"6つのメヌエット 第2番 ト長調",
+      players:"樫本(Vn)／チャウシャン(Vc)／バックス(Pf)", dur:150,
+      memo:"2分半の小品。狙いを替えすぎない。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"3人","WS","メヌエット主題"],
+        [40,"樫本(Vn)","BS","旋律を担当。バストで弓と表情を"],
+        [75,"チャウシャン(Vc)","BS","トリオの低音"],
+        [110,"3人","WS","再現から終止へ。引きのまま"]
+      ]
+    },
+    {
+      composer:"クライスラー", title:"ピアノ三重奏のための3つの小品",
+      players:"樫本(Vn)／チャウシャン(Vc)／バックス(Pf)", dur:540,
+      memo:"3つの小品。ヴァイオリンが主役。ポルタメントと装飾の左手を見せたい。曲間の拍手で時間がズレるので手動同期を使う。",
+      movs:[["第1曲",0],["第2曲",190],["第3曲",370]],
+      cues:[
+        [0,"3人","WS","第1曲 開始"],
+        [30,"樫本(Vn)","US","甘い主題。左手のヴィブラートを見せる"],
+        [100,"チャウシャン(Vc)","BS","チェロの対旋律"],
+        [150,"樫本(Vn)","US","主題回帰〜終止"],
+        [190,"3人","WS","第2曲 開始"],
+        [220,"樫本(Vn)","US","ヴァイオリンの歌"],
+        [290,"バックス(Pf)","BS","ピアノの間奏"],
+        [330,"樫本(Vn)","US","終結部。引きで受ける"],
+        [370,"3人","WS","第3曲 開始"],
+        [400,"樫本(Vn)","BS","軽快な主題。弓の跳ね"],
+        [460,"樫本(Vn)","US","技巧的な結び"],
+        [500,"3人","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"ブラームス", title:"弦楽五重奏曲 ト長調 Op.111",
+      players:"ブロフツィン(Vn1)／ロメイコ(Vn2)／ベルトー(Va1)／ラ・マルカ(Va2)／プレッサー(Vc)", dur:1680,
+      memo:"★冒頭いきなりチェロの大主題。曲が始まる前からプレッサーに寄せて構えておく。第2楽章はヴィオラが主役。",
+      movs:[["I. アレグロ・ノン・トロッポ",0],["II. アダージョ",600],["III. ウン・ポコ・アレグレット",960],["IV. ヴィヴァーチェ",1260]],
+      cues:[
+        [0,"プレッサー(Vc)","US","★開始と同時にチェロの大主題。事前に構えておく"],
+        [60,"ブロフツィン(Vn1)","BS","第1ヴァイオリンが主題を継ぐ"],
+        [130,"ベルトー(Va1)＋ラ・マルカ(Va2)","WS","ヴィオラ2本の刻み"],
+        [190,"ブロフツィン(Vn1)","US","第2主題の歌"],
+        [260,"全員","WS","展開部の総奏"],
+        [340,"ロメイコ(Vn2)","BS","内声が動く。2人が入る画角で"],
+        [410,"プレッサー(Vc)","US","チェロ主題の再現"],
+        [480,"ブロフツィン(Vn1)","US","再現部の歌。寄りで表情を"],
+        [540,"全員","WS","コーダ。引きに構え、終止まで動かさない"],
+        [600,"ベルトー(Va1)","US","★アダージョ主題。この楽章はヴィオラが主役"],
+        [690,"プレッサー(Vc)","US","チェロの応答"],
+        [760,"ブロフツィン(Vn1)","US","ヴァイオリンの変奏"],
+        [830,"全員","WS","高まる中間部"],
+        [900,"ベルトー(Va1)","US","主題回帰〜終止"],
+        [960,"全員","WS","間奏曲風の主題"],
+        [1010,"ブロフツィン(Vn1)","BS","旋律を担当。バストで弓と表情を"],
+        [1070,"ベルトー(Va1)","BS","ヴィオラの対旋律"],
+        [1130,"全員","WS","トリオ（長調）"],
+        [1200,"ブロフツィン(Vn1)","BS","主題の再現。引きで全体を受ける"],
+        [1260,"全員","WS","フィナーレ主題"],
+        [1310,"ブロフツィン(Vn1)","BS","主題の提示。バストで安定させる"],
+        [1370,"ラ・マルカ(Va2)＋ベルトー(Va1)","WS","ヴィオラの推進"],
+        [1430,"プレッサー(Vc)","US","チェロの動き"],
+        [1490,"ブロフツィン(Vn1)","US","高揚する部分。寄りのまま押す"],
+        [1550,"全員","WS","チャルダーシュ風のコーダへ"],
+        [1620,"全員","WS","終演。拍手まで引きで"]
+      ]
+    }
+  ]
+},
+{
+  date:"9/20", dow:"日", venue:"アクリエひめじ 大ホール", start:"17:00", open:"16:15",
+  note:"最終日・昼公演。カーテンコールが長くなる可能性が高いので、最後まで回し続ける。",
+  pieces:[
+    {
+      composer:"サン＝サーンス", title:"セレナーデ 変ホ長調 Op.15",
+      players:"ロメイコ(Vn)／ラ・マルカ(Va)／ル・サージュ(Pf)／バックス(Pf)", dur:330,
+      memo:"ピアノ2台（原曲はピアノ＋ハルモニウム）。4人が離れて配置される可能性大。開演前に必ず立ち位置を確認。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"4人","WS","静かな開始。まず編成を見せる"],
+        [40,"ラ・マルカ(Va)","US","ヴィオラの主題"],
+        [100,"ロメイコ(Vn)","US","ヴァイオリンが受ける"],
+        [160,"Vn＋Va","WS","弦の二重奏。2人を1画面に"],
+        [210,"ピアノ2台","WS","ピアノ2台の掛け合い"],
+        [260,"ロメイコ(Vn)","US","主題が戻る。寄りのまま保持"],
+        [300,"4人","WS","終止。引きのまま余韻を残す"]
+      ]
+    },
+    {
+      composer:"クルターグ", title:"リガトゥーラ ― フランセス＝マリー・ウィッティへのメッセージ Op.31b",
+      players:"チャウシャン(Vc)／プレッサー(Vc)／ロメイコ(Vn)／樫本(Vn)／バックス(Pf)", dur:240,
+      memo:"★極めて静かで音数が少ない。長いフェルマータと休符が多いので、寄ったまま保持する勇気を。演奏中はパンしない。終わっても拍手が来るまで動かさない。",
+      movs:[["全1曲",0]],
+      cues:[
+        [0,"全員","WS","開始。静寂ごと引きで撮る"],
+        [50,"チャウシャン(Vc)","US","チェロの持続音"],
+        [100,"プレッサー(Vc)","US","もう1本のチェロ"],
+        [150,"ロメイコ(Vn)＋樫本(Vn)","WS","高音のヴァイオリン2本"],
+        [190,"バックス(Pf)","BS","ピアノの点描。手元に寄る"],
+        [215,"全員","WS","消える終結。拍手が来るまで動かさない"]
+      ]
+    },
+    {
+      composer:"ライネッケ", title:"三重奏曲 Op.274",
+      players:"メイエ(Cl)／ヴラトコヴィチ(Hr)／ル・サージュ(Pf)", dur:1440,
+      memo:"クラリネット・ホルン・ピアノの三重奏。管2本の掛け合いが多いので、2ショットが取れる位置を事前に決めておく。",
+      movs:[["I. アレグロ",0],["II. メルヘン（スケルツォ）",480],["III. アダージョ",780],["IV. フィナーレ",1080]],
+      cues:[
+        [0,"3人","WS","冒頭。まず全員が入る引きで"],
+        [40,"メイエ(Cl)","US","クラリネットの第1主題"],
+        [110,"ヴラトコヴィチ(Hr)","US","ホルンの応答"],
+        [180,"ル・サージュ(Pf)","BS","ピアノの走句"],
+        [240,"Cl＋Hr","WS","管2本の掛け合い"],
+        [310,"メイエ(Cl)","BS","第2主題。歌う部分なのでバストで"],
+        [380,"3人","WS","再現部〜コーダ"],
+        [480,"3人","WS","スケルツォ主題"],
+        [530,"ヴラトコヴィチ(Hr)","US","ホルンの物語風の動機"],
+        [590,"メイエ(Cl)","BS","クラリネットの応答"],
+        [650,"ル・サージュ(Pf)","BS","トリオのピアノ"],
+        [720,"3人","WS","主題の再現。引きで全体を受ける"],
+        [780,"ヴラトコヴィチ(Hr)","US","★アダージョ。ホルンの長い歌。この楽章の主役"],
+        [870,"メイエ(Cl)","US","クラリネットが受ける"],
+        [950,"ル・サージュ(Pf)","BS","ピアノの和音"],
+        [1010,"Cl＋Hr","WS","二重の歌〜終止"],
+        [1080,"3人","WS","フィナーレ主題"],
+        [1130,"メイエ(Cl)","BS","快速の主題。バストで指と弓を"],
+        [1190,"ヴラトコヴィチ(Hr)","US","ホルンのファンファーレ"],
+        [1250,"ル・サージュ(Pf)","BS","ピアノの技巧"],
+        [1310,"Cl＋Hr","WS","管2本が重なる。2ショットで"],
+        [1370,"3人","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"リース", title:"ピアノ五重奏曲 Op.74",
+      players:"ブロフツィン(Vn)／ラ・マルカ(Va)／チャウシャン(Vc)／シェハタ(Cb)／ル・サージュ(Pf)", dur:1680,
+      memo:"シューベルト「ます」と同じ編成（Pf＋Vn＋Va＋Vc＋Cb）。コントラバスが入るので画角は横に広い。ピアノの手元カットを多めに。",
+      movs:[["I. アレグロ",0],["II. ラルゲット",660],["III. ロンド",1140]],
+      cues:[
+        [0,"全員","WS","冒頭。5人の配置を見せる"],
+        [50,"ル・サージュ(Pf)","BS","ピアノの第1主題"],
+        [120,"ブロフツィン(Vn)","US","ヴァイオリンが受ける"],
+        [190,"チャウシャン(Vc)","US","チェロの対旋律"],
+        [260,"ル・サージュ(Pf)","BS","走句。手元を大きく"],
+        [330,"ブロフツィン(Vn)","BS","第2主題。歌う部分なのでバストで"],
+        [400,"全員","WS","展開部。担当が細かく入れ替わるので引きで受ける"],
+        [480,"ラ・マルカ(Va)＋シェハタ(Cb)","WS","内声と低声の動き。2人を1画面に"],
+        [560,"ル・サージュ(Pf)","BS","再現部。主題が戻る"],
+        [620,"全員","WS","コーダ。引きに構え、終止まで動かさない"],
+        [660,"チャウシャン(Vc)","US","ラルゲット。チェロの歌"],
+        [750,"ブロフツィン(Vn)","US","ヴァイオリンの主題"],
+        [840,"ル・サージュ(Pf)","BS","ピアノの装飾"],
+        [920,"ラ・マルカ(Va)","US","ヴィオラの歌"],
+        [1000,"全員","WS","全体が高まる。引きで厚みを出す"],
+        [1080,"ブロフツィン(Vn)","US","静かな終止。音が消えても3秒は保持"],
+        [1140,"全員","WS","ロンド主題。全員を引きで"],
+        [1190,"ル・サージュ(Pf)","BS","ピアノの主題"],
+        [1260,"ブロフツィン(Vn)","BS","ヴァイオリンの応答"],
+        [1330,"シェハタ(Cb)","US","★コントラバスの見せ場"],
+        [1400,"チャウシャン(Vc)","US","チェロの推進"],
+        [1470,"ル・サージュ(Pf)","BS","技巧的な走句"],
+        [1540,"全員","WS","総奏。全員が入る引きへ戻す"],
+        [1610,"全員","WS","コーダ。引きに構え、終止まで動かさない"]
+      ]
+    },
+    {
+      composer:"ドホナーニ", title:"六重奏曲 ハ長調 Op.37",
+      players:"樫本(Vn)／ベルトー(Va)／プレッサー(Vc)／メイエ(Cl)／ヴラトコヴィチ(Hr)／バックス(Pf)", dur:1800,
+      memo:"★音楽祭の締め。冒頭はホルンの主題から始まるので開始前にヴラトコヴィチへ構えておく。フィナーレはジャズ／ラグタイム風で奏者の表情が出る。ラストは引きで全員＋拍手・カーテンコールまで必ず回し続ける。",
+      movs:[["I. アレグロ・アパッショナート",0],["II. インテルメッツォ",600],["III. アレグロ・コン・センティメント",1020],["IV. フィナーレ",1380]],
+      cues:[
+        [0,"ヴラトコヴィチ(Hr)","US","★冒頭はホルンの主題から。開始前に構えておく"],
+        [60,"樫本(Vn)","US","ヴァイオリンが受ける"],
+        [130,"バックス(Pf)","BS","ピアノの和音"],
+        [200,"メイエ(Cl)","US","クラリネットの第2主題"],
+        [270,"全員","WS","展開部の総奏"],
+        [350,"プレッサー(Vc)","US","チェロの歌。弓と左手が入る寄りで"],
+        [420,"ベルトー(Va)","BS","ヴィオラの内声"],
+        [490,"樫本(Vn)","US","再現部。主題が戻る"],
+        [550,"全員","WS","コーダ。引きに構え、終止まで動かさない"],
+        [600,"全員","WS","インテルメッツォ。行進曲風の開始"],
+        [650,"ベルトー(Va)","US","ヴィオラの主題"],
+        [720,"メイエ(Cl)","US","クラリネットの歌"],
+        [800,"ヴラトコヴィチ(Hr)","US","ホルンの応答"],
+        [870,"バックス(Pf)","BS","ピアノの中間部"],
+        [940,"全員","WS","楽章の終結。引きで受けて次に備える"],
+        [1020,"全員","WS","スケルツォ的な開始"],
+        [1070,"樫本(Vn)","BS","ヴァイオリンの主題"],
+        [1130,"プレッサー(Vc)","US","チェロの歌。弓と左手が入る寄りで"],
+        [1190,"メイエ(Cl)＋ヴラトコヴィチ(Hr)","WS","管2本の絡み"],
+        [1260,"バックス(Pf)","BS","ピアノが主導。手元を大きく"],
+        [1320,"全員","WS","楽章の終結。引きで受けて次に備える"],
+        [1380,"全員","WS","★ジャズ風フィナーレ開始"],
+        [1430,"メイエ(Cl)","US","クラリネットの軽快な主題。表情を大きく"],
+        [1500,"樫本(Vn)","BS","ヴァイオリンの応答"],
+        [1560,"ヴラトコヴィチ(Hr)","US","ホルンのシンコペーション"],
+        [1620,"バックス(Pf)","BS","ピアノのラグタイム風"],
+        [1680,"全員","WS","総奏。全員が入る引きへ戻す"],
+        [1740,"全員","WS","★終演。引きで6人＋拍手・カーテンコールまで回す"]
+      ]
+    }
+  ]
+}
+];
+
+
+/* --- 古いiOS向けの補完 --- */
+if(!String.prototype.padStart){String.prototype.padStart=function(n,p){
+  var s=String(this);p=p===undefined?" ":String(p);
+  while(s.length<n){s=p+s;}return s.slice(-Math.max(n,s.length));};}
+
+var S={view:"home",d:0,p:0,started:null,pausedAt:0,running:false,dim:false,list:false,ci:-99};
+try{var _s=localStorage.getItem("lepont26");if(_s){var _o=JSON.parse(_s);
+  S.d=_o.d||0;S.dim=!!_o.dim;S.list=!!_o.list;}}catch(e){}
+function save(){try{localStorage.setItem("lepont26",
+  JSON.stringify({d:S.d,dim:S.dim,list:S.list}));}catch(e){}}
+
+function mmss(s){s=Math.max(0,Math.round(s));var m=Math.floor(s/60);
+  return m+":"+String(s%60).padStart(2,"0");}
+function el(){return S.running?(Date.now()-S.started)/1000:S.pausedAt;}
+function piece(){return DATA[S.d].pieces[S.p];}
+function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function sc(s){return s==="US"?"us":s==="BS"?"bs":"ws";}
+function movOf(pc,t){var n=pc.movs[0][0];
+  for(var i=0;i<pc.movs.length;i++){if(pc.movs[i][1]<=t)n=pc.movs[i][0];}return n;}
+function idxAt(pc,t){var ci=-1;
+  for(var i=0;i<pc.cues.length;i++){if(pc.cues[i][0]<=t)ci=i;}return ci;}
+
+var wl=null,nsv=null;
+var NOSLEEP_WEBM="data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAHpEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggHT7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECPQAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYhfM/u4liwdSZyBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhDuaygDgibCBQLqBQJqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYhfM/u4liwdSWfIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDEuMDAwMDAwMDAwAB9DtnWv54EAo6qBAACA8AIAnQEqQABAAABHCIWFiJmEiAKCAAZwPEJgCrIg9zAA/v+PvAAcU7trkbuPs4EAt4r3gQHxggGf8IED";
+var NOSLEEP_MP4="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAMQbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAA+gAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAjp0cmFrAAAAXHRraGQAAAADAAAAAAAAAAAAAAABAAAAAAAAA+gAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAPoAAAAAAABAAAAAAGybWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAABAAAAAQABVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABXW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAR1zdGJsAAAAuXN0c2QAAAAAAAAAAQAAAKlhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABFUxhdmM2MC4zMS4xMDIgbGlieDI2NAAAAAAAAAAAAAAAGP//AAAAL2F2Y0MBQsAe/+EAF2dCwB7ZBCbARAAAAwAEAAADAAg8WLkgAQAFaMuDyyAAAAAQcGFzcAAAAAEAAAABAAAAFGJ0cnQAAAAAAAAUkAAAFJAAAAAYc3R0cwAAAAAAAAABAAAAAQAAQAAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAACkgAAAAEAAAAUc3RjbwAAAAAAAAABAAADQAAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNjAuMTYuMTAwAAAACGZyZWUAAAKabWRhdAAAAnAGBf//bNxF6b3m2Ui3lizYINkj7u94MjY0IC0gY29yZSAxNjQgcjMxMDggMzFlMTlmOSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMjMgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0wIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDE6MHgxMTEgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTAgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz0yIGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MCB3ZWlnaHRwPTAga2V5aW50PTI1MCBrZXlpbnRfbWluPTEgc2NlbmVjdXQ9NDAgaW50cmFfcmVmcmVzaD0wIHJjX2xvb2thaGVhZD00MCByYz1jcmYgbWJ0cmVlPTEgY3JmPTIzLjAgcWNvbXA9MC42MCBxcG1pbj0wIHFwbWF4PTY5IHFwc3RlcD00IGlwX3JhdGlvPTEuNDAgYXE9MToxLjAwAIAAAAAaZYiEBX///w9FAAFC3ycnJ1111111111114A=";
+function vid(){
+  if(nsv)return nsv;
+  try{
+    var v=document.createElement("video");
+    v.setAttribute("playsinline","");v.setAttribute("webkit-playsinline","");
+    v.setAttribute("muted","");v.muted=true;v.loop=true;v.defaultMuted=true;
+    v.style.cssText="position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none;z-index:-1";
+    var s1=document.createElement("source");s1.src=NOSLEEP_MP4;s1.type="video/mp4";
+    var s2=document.createElement("source");s2.src=NOSLEEP_WEBM;s2.type="video/webm";
+    v.appendChild(s1);v.appendChild(s2);
+    v.addEventListener("ended",function(){try{v.currentTime=0;v.play();}catch(e){}});
+    document.body.appendChild(v);nsv=v;
+  }catch(e){}
+  return nsv;
+}
+function playVid(){try{var v=vid();if(!v)return;var pr=v.play();
+  if(pr&&pr.catch)pr.catch(function(){});}catch(e){}}
+function lockScreen(){
+  if(navigator.wakeLock&&navigator.wakeLock.request){
+    try{navigator.wakeLock.request("screen").then(function(s){wl=s;
+      s.addEventListener("release",function(){wl=null;});})
+      .catch(function(){playVid();});return;}catch(e){}
+  }
+  playVid();
+}
+function unlockScreen(){
+  if(wl){try{wl.release();}catch(e){}wl=null;}
+  if(nsv){try{nsv.pause();}catch(e){}}
+}
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible"&&S.running&&!wl)lockScreen();});
+
+/* ---------- ホーム ---------- */
+function home(){
+  var d=DATA[S.d],h="";
+  h+='<div class="top"><div class="top-row">'+
+     '<div class="top-title">ル・ポン国際音楽祭2026 撮影キューシート</div>'+
+     '<button class="iconbtn'+(S.dim?" on":"")+'" onclick="toggleDim()">暗</button>'+
+     '</div></div><div class="wrap"><div class="days">';
+  for(var i=0;i<DATA.length;i++)
+    h+='<button class="day'+(i===S.d?" sel":"")+'" onclick="setDay('+i+')">'+
+       '<b>'+DATA[i].date+'</b><span>'+DATA[i].dow+' '+DATA[i].start+'</span></button>';
+  h+='</div><div class="oflag" id="oflag"><b>オフライン準備を確認中…</b>'+
+     'この表示が緑になれば、機内モードでも起動します。</div><div class="venue"><div class="v1">'+esc(d.venue)+'</div>'+
+     '<div class="v2">開場 '+d.open+'／開演 '+d.start+'<br>'+esc(d.note)+'</div></div>';
+  h+='<div class="sect">演奏曲目（タップでキュー画面へ）</div>';
+  for(var j=0;j<d.pieces.length;j++){var p=d.pieces[j];
+    h+='<button class="pc" onclick="openPiece('+j+')"><div class="n">'+(j+1)+'</div>'+
+       '<div class="b"><div class="cp">'+esc(p.composer)+'</div>'+
+       '<div class="ti">'+esc(p.title)+'</div>'+
+       '<div class="pl">'+esc(p.players)+'</div></div>'+
+       '<div class="du">約'+Math.round(p.dur/60)+'分</div></button>';}
+  h+='<div class="sect">カメラ配置メモ</div><div class="rig">'+
+     '<div class="r"><b>A／iPhone16Pro</b><div>舞台左・固定・広角。客席込みで会場を広く。開演前から回して止めない。</div></div>'+
+     '<div class="r"><b>B／FX3</b><div>固定・100mm前後。演奏者全体が収まる画角。曲ごとに人数が変わるので、曲間に上の出演者欄で編成を確認して画角を合わせ直す。</div></div>'+
+     '<div class="r"><b>C／FX6</b><div>Bの隣・50〜400mm・カメラマン操作。このアプリの指示で注目奏者を順に狙う。</div></div>'+
+     '<div class="r"><b>寄りの目安</b><div><span style="color:var(--us)">US</span>＝顔と手元のアップ　'+
+     '<span style="color:var(--bs)">BS</span>＝バスト・楽器込み　'+
+     '<span style="color:var(--ws)">WS</span>＝2人以上・引き</div></div></div>';
+  h+='<div class="foot">・タイマーは曲ごとにリセットして使います。曲が始まった瞬間に［開始］を押してください。<br>'+
+     '・楽章の長さは標準的な演奏からの推定値です。実演でズレたら［次へ／前へ］でその場のキューに合わせ直すか、［−5秒／＋5秒］で微調整してください。<br>'+
+     '・★印は外してはいけない見せ場です。<br>'+
+     '・上の表示が緑になった後は、機内モードでも動きます。<br>'+
+     '・［開始］中は画面が消えないようにしていますが、確実を期すなら 設定 → 画面表示と明るさ → 自動ロック → なし に設定してください。<br>'+
+     '・iPhone 8／iOS 11.3以降で動作します。</div></div>';
+  return h;
+}
+
+/* ---------- キュー画面 ---------- */
+function nowHTML(pc,ci){
+  if(ci<0)return '<div class="now" id="now"><div class="who" style="font-size:21px;color:var(--sub)">'+
+    '曲頭で［開始］</div><div class="nt">最初の音が鳴った瞬間に押してください。</div></div>';
+  var c=pc.cues[ci],k=sc(c[2]);
+  return '<div class="now '+k+'" id="now"><div class="hd"><span class="shot '+k+'">'+c[2]+'</span>'+
+    '<span class="at">'+mmss(c[0])+' 〜</span></div>'+
+    '<div class="who">'+esc(c[1])+'</div><div class="nt">'+esc(c[3])+'</div></div>';
+}
+function nextHTML(pc,ci,t){
+  var n=pc.cues[ci+1];
+  if(!n)return '<div class="next" id="nx"><div class="cd" id="cd">終</div>'+
+    '<div class="tx"><b>最後のキューです</b><span>拍手が終わるまで回し続ける</span></div></div>';
+  var left=n[0]-t;
+  return '<div class="next'+(left<=10?" soon":"")+'" id="nx">'+
+    '<div class="cd" id="cd">'+(left>=0?"あと"+Math.ceil(left)+"秒":"—")+'</div>'+
+    '<div class="tx"><b>次： '+n[2]+'　'+esc(n[1])+'</b><span>'+esc(n[3])+'</span></div></div>';
+}
+function upHTML(pc,ci){
+  var h='<div class="up" id="up">',c=0;
+  for(var k=ci+2;k<pc.cues.length&&c<3;k++,c++){
+    var q=pc.cues[k];
+    h+='<div class="r"><div class="t">'+mmss(q[0])+'</div>'+
+      '<div class="dot" style="background:var(--'+sc(q[2])+')"></div>'+
+      '<div class="c"><b>'+q[2]+'　'+esc(q[1])+'</b><i>'+esc(q[3])+'</i></div></div>';
+  }
+  if(c===0)return '<div class="up" id="up"></div>';
+  return '<div class="up" id="up"><div class="h">この後の流れ</div>'+h.slice(24)+'</div>';
+}
+function listHTML(pc,ci){
+  var h='<div class="list" id="lst">',last="";
+  for(var k=0;k<pc.cues.length;k++){
+    var mv=movOf(pc,pc.cues[k][0]);
+    if(mv!==last){h+='<div class="mvhdr">'+esc(mv)+'</div>';last=mv;}
+    h+='<button class="li '+(k===ci?"cur":(k<ci?"past":""))+'" id="li'+k+'" onclick="jump('+k+')">'+
+      '<div class="t">'+mmss(pc.cues[k][0])+'</div>'+
+      '<div class="dot" style="background:var(--'+sc(pc.cues[k][2])+')"></div>'+
+      '<div class="c"><b>'+pc.cues[k][2]+'　'+esc(pc.cues[k][1])+'</b><i>'+esc(pc.cues[k][3])+'</i></div></button>';
+  }
+  return h+'</div>';
+}
+function cuepage(){
+  var pc=piece(),t=el(),ci=idxAt(pc,t);S.ci=ci;
+  var h='<div class="cuepage"><div class="top"><div class="top-row">'+
+    '<button class="back" onclick="goHome()">‹ 曲目</button>'+
+    '<div class="top-title">'+(S.p+1)+'. '+esc(pc.title)+'</div>'+
+    '<button class="iconbtn'+(S.list?" on":"")+'" onclick="toggleList()">一覧</button>'+
+    '<button class="iconbtn'+(S.dim?" on":"")+'" onclick="toggleDim()">暗</button></div></div>'+
+    '<div class="meta"><div class="mv" id="mv">'+esc(movOf(pc,t))+'　/　'+esc(pc.players)+'</div>'+
+    (pc.memo?'<div class="memo">'+esc(pc.memo)+'</div>':'')+'</div>'+
+    '<div class="clock"><div class="big" id="clk">'+mmss(t)+'</div>'+
+    '<div class="tot">/ 約'+mmss(pc.dur)+'</div>'+
+    '<div class="st'+(S.running?" run":"")+'" id="st">'+(S.running?"進行中":"停止")+'</div></div>'+
+    '<div class="bar"><i id="bar" style="width:'+Math.min(100,t/pc.dur*100)+'%"></i></div>'+
+    nowHTML(pc,ci)+nextHTML(pc,ci,t)+(S.list?listHTML(pc,ci):upHTML(pc,ci))+
+    '<div class="ctl"><div class="row">'+
+    '<button class="btn sm" onclick="nudge(-5)">−5秒</button>'+
+    '<button class="btn '+(S.running?"stop":"go")+'" id="runb" onclick="toggleRun()">'+
+      (S.running?"一時停止":(S.pausedAt>0?"再開":"開始"))+'</button>'+
+    '<button class="btn sm" onclick="nudge(5)">＋5秒</button></div><div class="row">'+
+    '<button class="btn sm" onclick="reset()">リセット</button>'+
+    '<button class="btn key" onclick="step(-1)">‹ 前へ</button>'+
+    '<button class="btn key" onclick="step(1)">次へ ›</button>'+
+    '<button class="btn sm" onclick="nextPiece()">次の曲 ›</button>'+
+    '</div></div></div>';
+  return h;
+}
+
+/* ---------- 差分更新 ---------- */
+function tick(){
+  if(S.view!=="cue")return;
+  var pc=piece(),t=el(),ci=idxAt(pc,t),g=function(i){return document.getElementById(i);};
+  var clk=g("clk");if(!clk)return;
+  clk.textContent=mmss(t);
+  g("bar").style.width=Math.min(100,t/pc.dur*100)+"%";
+  var st=g("st");st.textContent=S.running?"進行中":"停止";st.className="st"+(S.running?" run":"");
+  var rb=g("runb");rb.textContent=S.running?"一時停止":(S.pausedAt>0?"再開":"開始");
+  rb.className="btn "+(S.running?"stop":"go");
+  if(ci!==S.ci){
+    var old=S.ci;S.ci=ci;
+    g("now").outerHTML=nowHTML(pc,ci);
+    g("nx").outerHTML=nextHTML(pc,ci,t);
+    g("mv").innerHTML=esc(movOf(pc,t))+"　/　"+esc(pc.players);
+    if(!S.list){var u=g("up");if(u)u.outerHTML=upHTML(pc,ci);}
+    if(S.list){
+      for(var k=0;k<pc.cues.length;k++){
+        var e=g("li"+k);if(!e)continue;
+        e.className="li "+(k===ci?"cur":(k<ci?"past":""));
+      }
+      var cur=g("li"+ci);
+      if(cur&&old!==-99){try{cur.scrollIntoView({block:"center",behavior:"smooth"});}
+        catch(e){try{cur.scrollIntoView(false);}catch(e2){}}}
+    }
+  }else{
+    var n=pc.cues[ci+1];
+    if(n){var left=n[0]-t;
+      g("cd").textContent=left>=0?"あと"+Math.ceil(left)+"秒":"—";
+      g("nx").className="next"+(left<=10?" soon":"");}
+  }
+}
+
+/* ---------- 操作 ---------- */
+function render(){S.ci=-99;document.getElementById("app").innerHTML=
+  (S.view==="home"?home():cuepage());document.body.className=S.dim?"dim":"";
+  if(S.view==="home")paintOff();}
+function setDay(i){S.d=i;save();render();window.scrollTo(0,0);}
+function openPiece(j){S.p=j;S.view="cue";S.started=null;S.pausedAt=0;S.running=false;
+  render();window.scrollTo(0,0);}
+function goHome(){S.view="home";S.running=false;unlockScreen();render();window.scrollTo(0,0);}
+function toggleDim(){S.dim=!S.dim;save();document.body.className=S.dim?"dim":"";
+  render();}
+function toggleList(){S.list=!S.list;save();render();}
+function toggleRun(){
+  if(S.running){S.pausedAt=el();S.running=false;unlockScreen();}
+  else{S.started=Date.now()-S.pausedAt*1000;S.running=true;lockScreen();}
+  render();}
+function reset(){S.started=null;S.pausedAt=0;S.running=false;unlockScreen();render();}
+function setT(t){t=Math.max(0,t);S.pausedAt=t;
+  if(S.running)S.started=Date.now()-t*1000;
+  tick();}
+function nudge(s){setT(el()+s);}
+function jump(k){setT(piece().cues[k][0]);}
+function step(dir){
+  var c=piece().cues,t=el(),i;
+  if(dir>0){for(i=0;i<c.length;i++){if(c[i][0]>t+0.4){setT(c[i][0]);return;}}
+    setT(piece().dur);}
+  else{var pv=0;for(i=0;i<c.length;i++){if(c[i][0]<t-1.5)pv=c[i][0];}setT(pv);}
+}
+function nextPiece(){if(S.p<DATA[S.d].pieces.length-1)openPiece(S.p+1);else goHome();}
+
+/* ---------- オフライン化（Service Worker） ---------- */
+var OFF={state:"checking",msg:""};
+function setOff(st,msg){OFF.state=st;OFF.msg=msg;paintOff();}
+function paintOff(){
+  var e=document.getElementById("oflag");if(!e)return;
+  var standalone=(window.navigator.standalone===true)||
+    (window.matchMedia&&window.matchMedia("(display-mode: standalone)").matches);
+  if(OFF.state==="ok"){
+    e.className="oflag ok";
+    e.innerHTML='<b>オフライン準備 完了</b>'+
+      (standalone?'ホーム画面アプリとして起動中。電波がなくても動きます。'
+                 :'この端末に保存されました。次は 共有 → ホーム画面に追加 でアプリとして使えます。');
+  }else if(OFF.state==="ng"){
+    e.className="oflag ng";e.innerHTML='<b>オフライン準備 未完了</b>'+OFF.msg;
+  }else{
+    e.className="oflag";e.innerHTML='<b>オフライン準備を確認中…</b>'+
+      'この表示が緑になれば、機内モードでも起動します。';
+  }
+}
+(function(){
+  if(location.protocol==="file:"){
+    setOff("ng","ファイルから直接開いています。この開き方ではタイマーが動きません。"+
+      "Safariでhttpsのアドレスから開いてください。");return;
+  }
+  if(!("serviceWorker" in navigator)){
+    setOff("ng","この端末はオフライン保存に対応していません。iOSを11.3以降に更新するか、"+
+      "Safariの リーディングリストに追加 でオフライン保存してください。");return;
+  }
+  var tries=0;
+  function check(){
+    if(!window.caches){setOff("ng","キャッシュ機能が無効です。プライベートブラウズを解除してください。");return;}
+    tries++;
+    caches.open("lepont2026-v1").then(function(c){
+      return c.match("./index.html");
+    }).then(function(hit){
+      if(hit){setOff("ok","");return;}
+      if(tries<25)setTimeout(check,800);
+      else setOff("ng","保存が終わりませんでした。電波の良い場所で画面を一度更新してください。");
+    }).catch(function(){ if(tries<25)setTimeout(check,1000); });
+  }
+  check();
+  navigator.serviceWorker.register("sw.js").then(function(reg){
+    setTimeout(check,400);
+  }).catch(function(err){
+    setOff("ng","保存に失敗しました（"+(err&&err.name?err.name:"エラー")+"）。"+
+      "httpsのアドレスで開いているか確認してください。");
+  });
+})();
+
+setInterval(tick,400);
+render();
+</script>
+</body>
+</html>
