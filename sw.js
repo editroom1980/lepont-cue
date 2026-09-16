@@ -1,9 +1,11 @@
-var CACHE = "lepont2026-v4";
+var CACHE = "lepont2026-v5";
 var FILES = ["./", "./index.html", "./manifest.json",
              "./apple-touch-icon.png", "./icon-192.png", "./icon-512.png"];
 self.addEventListener("install", function(e){
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE).then(function(c){ return c.addAll(FILES); }));
+  e.waitUntil(caches.open(CACHE).then(function(c){
+    return c.addAll(FILES.map(function(u){ return new Request(u, {cache: "reload"}); }));
+  }));
 });
 self.addEventListener("activate", function(e){
   e.waitUntil(caches.keys().then(function(ks){

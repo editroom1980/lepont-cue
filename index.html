@@ -1246,9 +1246,7 @@ function paintOff(){
   function check(){
     if(!window.caches){setOff("ng","キャッシュ機能が無効です。プライベートブラウズを解除してください。");return;}
     tries++;
-    caches.open("lepont2026-v1").then(function(c){
-      return c.match("./index.html");
-    }).then(function(hit){
+    caches.match("./index.html").then(function(hit){
       if(hit){setOff("ok","");return;}
       if(tries<25)setTimeout(check,800);
       else setOff("ng","保存が終わりませんでした。電波の良い場所で画面を一度更新してください。");
