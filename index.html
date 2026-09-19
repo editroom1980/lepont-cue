@@ -84,7 +84,17 @@ button{font-family:inherit;color:inherit;border:none;background:none;cursor:poin
 
 .cuepage{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
 .meta{padding:8px 12px 0}
-.meta .mv{font-size:12px;color:var(--accent);font-weight:700;line-height:1.5}
+.mvl{margin:8px 12px 0;padding:7px 10px;border-radius:10px;background:var(--panel);border:1px solid var(--line);
+  display:-webkit-flex;display:flex;-webkit-flex-wrap:wrap;flex-wrap:wrap;-webkit-align-items:baseline;align-items:baseline}
+.mvl > * + *{margin-left:7px}
+.mvl b{font-size:20px;font-weight:800;color:var(--accent);line-height:1.2}
+.mvl i{font-style:normal;font-size:11.5px;color:var(--sub);border:1px solid var(--line);border-radius:5px;padding:1px 5px;
+  font-variant-numeric:tabular-nums}
+.mvl span{font-size:12px;color:var(--sub);line-height:1.45;margin-left:0;margin-top:3px;
+  -webkit-flex:1 0 100%;flex:1 0 100%}
+.mvl.hit{-webkit-animation:mvhit 1.1s ease-in-out 4;animation:mvhit 1.1s ease-in-out 4}
+@-webkit-keyframes mvhit{0%,100%{background:var(--panel);border-color:var(--line)}50%{background:#3b2c09;border-color:var(--accent)}}
+@keyframes mvhit{0%,100%{background:var(--panel);border-color:var(--line)}50%{background:#3b2c09;border-color:var(--accent)}}
 .meta .memo{font-size:11.5px;color:var(--sub);line-height:1.6;margin-top:5px;
   background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px}
 .clock{padding:10px 12px 5px;display:flex;align-items:baseline}
@@ -95,8 +105,9 @@ button{font-family:inherit;color:inherit;border:none;background:none;cursor:poin
 .clock .st{margin-left:auto;font-size:11px;color:var(--sub);
   border:1px solid var(--line);border-radius:6px;padding:3px 7px}
 .clock .st.run{color:#000;background:#3ddc84;border-color:#3ddc84;font-weight:700}
-.bar{height:4px;background:var(--panel2);margin:0 12px;border-radius:2px;overflow:hidden}
+.bar{position:relative;height:5px;background:var(--panel2);margin:0 12px;border-radius:2px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--accent);width:0}
+.bar u{position:absolute;top:0;bottom:0;width:2px;background:var(--bg)}
 
 .now{margin:12px;border-radius:14px;border:2px solid var(--line);
   background:var(--panel);padding:15px;position:relative;overflow:hidden}
@@ -900,7 +911,7 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,p){
   var s=String(this);p=p===undefined?" ":String(p);
   while(s.length<n){s=p+s;}return s.slice(-Math.max(n,s.length));};}
 
-var S={view:"home",d:0,p:0,started:null,pausedAt:0,running:false,dim:false,list:false,ci:-99,mi:0,wait:false,pw:false,w0:0,done:false,hold:false,pk:-1};
+var S={view:"home",d:0,p:0,started:null,pausedAt:0,running:false,dim:false,list:false,ci:-99,mi:0,wait:false,pw:false,w0:0,done:false,hold:false,pk:-1,pmv:0,flash:0,fl:false};
 try{var _s=localStorage.getItem("lepont26");if(_s){var _o=JSON.parse(_s);
   S.d=_o.d||0;S.dim=!!_o.dim;S.list=!!_o.list;}}catch(e){}
 function save(){try{localStorage.setItem("lepont26",
@@ -1320,6 +1331,15 @@ function stripHTML(list){var h="",i;
   for(i=0;i<list.length;i++)h+='<div class="fi">'+face(list[i].name)+
     '<div class="fn"><b>'+esc(list[i].name)+'</b><br>'+esc(list[i].inst)+'</div></div>';
   return h?'<div class="fstrip">'+h+'</div>':"";}
+function movParts(pc,t){var n=movOf(pc,t),m=n.match(/^(.+?)\uFF08(.+)\uFF09$/);
+  return m?[m[1],m[2]]:[n,""];}
+function mvlHTML(pc,t){var p=movParts(pc,t),tot=pc.movs.length,k=movIdx(pc,t)+1,
+  d=p[1]?p[1]+(movMood(pc,t)?"\uFF5C"+movMood(pc,t):""):movMood(pc,t);
+  return '<div class="mvl'+(S.flash>Date.now()?" hit":"")+'" id="mvl"><b>'+esc(p[0])+'</b>'+
+    (tot>1?'<i>'+k+' / '+tot+'</i>':"")+(d?'<span>'+esc(d)+'</span>':"")+'</div>';}
+function barHTML(pc,t){var h='<div class="bar"><i id="bar" style="width:'+Math.min(100,t/pc.dur*100)+'%"></i>',i;
+  for(i=1;i<pc.movs.length;i++)h+='<u style="left:'+(pc.movs[i][1]/pc.dur*100).toFixed(1)+'%"></u>';
+  return h+'</div>';}
 function movMood(pc,t){var n="",i;
   for(i=0;i<pc.movs.length;i++){if(pc.movs[i][1]<=t)n=pc.movs[i][2]||"";}return n;}
 function lineupHTML(pc){
@@ -1408,12 +1428,12 @@ function cuepage(){
     '<div class="top-title">'+(S.p+1)+'. '+esc(pc.title)+'</div>'+
     '<button class="iconbtn'+(S.list?" on":"")+'" onclick="toggleList()">一覧</button>'+
     '<button class="iconbtn'+(S.dim?" on":"")+'" onclick="toggleDim()">暗</button></div></div>'+
-    '<div class="meta"><div class="mv" id="mv">'+esc(movOf(pc,t))+'｜'+esc(movMood(pc,t))+'</div>'+
-    (pc.memo?'<div class="memo">'+esc(pc.memo)+'</div>':'')+'</div>'+
+    mvlHTML(pc,t)+
+    (pc.memo?'<div class="meta"><div class="memo">'+esc(pc.memo)+'</div></div>':'')+
     '<div class="clock"><div class="big" id="clk">'+mmss(t)+'</div>'+
     '<div class="tot">/ 約'+mmss(pc.dur)+'</div>'+
     '<div class="st'+stInfo()[0]+'" id="st">'+stInfo()[1]+'</div></div>'+
-    '<div class="bar"><i id="bar" style="width:'+Math.min(100,t/pc.dur*100)+'%"></i></div>'+micHTML()+
+    barHTML(pc,t)+micHTML()+
     (!S.running&&S.pausedAt===0?lineupHTML(pc):"")+
     nowHTML(pc,ci)+nextHTML(pc,ci,t)+(S.list?listHTML(pc,ci):upHTML(pc,ci))+
     '<div class="ctl"><div class="row">'+
@@ -1443,11 +1463,13 @@ function tick(){
   var mb=g("mvb");if(mb)mb.className=mvbClass(pc);
   var rb=g("runb");rb.textContent=S.running?"一時停止":(S.pausedAt>0?"再開":"開始");
   rb.className="btn "+(S.running?"stop":"go");
+  var mk=movIdx(pc,t);
+  if(mk!==S.pmv){S.pmv=mk;S.flash=Date.now()+4600;S.fl=true;var ml=g("mvl");if(ml)ml.outerHTML=mvlHTML(pc,t);}
+  else if(S.fl&&Date.now()>S.flash){S.fl=false;var ml2=g("mvl");if(ml2)ml2.outerHTML=mvlHTML(pc,t);}
   if(ci!==S.ci){
     var old=S.ci;S.ci=ci;
     g("now").outerHTML=nowHTML(pc,ci);
     g("nx").outerHTML=nextHTML(pc,ci,t);
-    g("mv").innerHTML=esc(movOf(pc,t))+"｜"+esc(movMood(pc,t));
     if(!S.list){var u=g("up");if(u)u.outerHTML=upHTML(pc,ci);}
     if(S.list){
       for(var k=0;k<pc.cues.length;k++){
@@ -1473,7 +1495,7 @@ function render(){S.ci=-99;document.getElementById("app").innerHTML=
 function setDay(i){S.d=i;save();render();window.scrollTo(0,0);}
 function openPiece(j,auto){if(S.w0)logEv("end",S.mi,el());
   S.p=j;S.view="cue";S.started=null;S.pausedAt=0;S.running=false;S.mi=0;S.wait=false;S.pw=false;S.w0=0;
-  S.done=false;S.hold=false;S.pk=-1;
+  S.done=false;S.hold=false;S.pk=-1;S.pmv=0;S.flash=0;S.fl=false;
   if(MIC.sync){if(auto)MIC.sync.nextPiece(micMovs(piece()),Date.now()/1000);
     else{MIC.sync.setPiece(micMovs(piece()));micSyncFromApp();}}
   if(MIC.want&&!MIC.on&&!MIC.busy&&!auto)micStart();
