@@ -240,6 +240,16 @@ button{font-family:inherit;color:inherit;border:none;background:none;cursor:poin
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
 .next.wait{border-style:solid;border-color:var(--accent);background:#2a220c}
 .clock .st.wait{color:#000;background:var(--accent);border-color:var(--accent);font-weight:700}
+.clock .st.armed{color:#3ddc84;border-color:#3ddc84;font-weight:700}
+.mic{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;width:calc(100% - 24px);
+  margin:0 12px 8px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);
+  font-size:12.5px;color:var(--sub);text-align:left}
+.mic > * + *{margin-left:8px}
+.mic .mk{-webkit-flex:0 0 auto;flex:0 0 auto;opacity:.45}
+.mic .mk.on,.mic .mk.ng{opacity:1}
+.mic .ms{-webkit-flex:1;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mic .lv{-webkit-flex:0 0 56px;flex:0 0 56px;height:6px;border-radius:3px;background:var(--panel2);overflow:hidden;display:block}
+.mic .lv b{display:block;height:100%;background:#3ddc84;width:0}
 .logb{width:100%}
 .logv{position:fixed;left:0;right:0;top:0;bottom:0;background:rgba(0,0,0,.94);z-index:50;
   padding:16px 14px;display:-webkit-flex;display:flex;-webkit-flex-direction:column;flex-direction:column}
@@ -775,70 +785,70 @@ var DATA = [
     },
     {
       composer:"ライネッケ", title:"三重奏曲 Op.274",
-      players:"メイエ(Cl)／ヴラトコヴィチ(Hr)／ル・サージュ(Pf)", dur:1440,
+      players:"メイエ(Cl)／ヴラトコヴィチ(Hr)／ル・サージュ(Pf)", dur:1552,
       memo:"クラリネット・ホルン・ピアノの3人の曲。クラリネットとホルンのやりとりが多いので、2ショットが取れる位置を事前に決めておく。",
       mood:"穏やかで温かい、懐かしいロマンティックな曲。",
       intent:"81歳のライネッケが書いた、温かいクラリネットと角笛のようなホルンの音色を楽しむ曲。",
       camera:"管楽器2人の受け渡しが中心。第3楽章はほぼずっとホルン。",
-      movs:[["第1楽章（ほどよく速い）",0,"堂々としたホルンで始まる"],["第2楽章（おとぎ話・ゆっくりめ）",480,"おとぎ話を語るような、穏やかな楽章"],["第3楽章（力強く速い）",780,"ホルンが引っぱる力強い楽章"],["第4楽章（最後の楽章）",1080,"明るく軽快に締める"]],
+      movs:[["第1楽章（ほどよく速い）",0,"堂々としたホルンで始まる"],["第2楽章（おとぎ話・ゆっくりめ）",450,"おとぎ話を語るような、穏やかな楽章"],["第3楽章（力強く速い）",792,"ホルンが引っぱる力強い楽章"],["第4楽章（最後の楽章）",1132,"明るく軽快に締める"]],
       cues:[
         [0,"3人","WS","冒頭。まず全員が入る引きで","珍しい3人の組み合わせ。まず並びを"],
-        [40,"ヴラトコヴィチ(Hr)","US","ホルンが堂々と最初のメロディを出す","曲の主役はまずホルン。堂々とした歌い出し"],
-        [110,"メイエ(Cl)","US","クラリネットが加わり、少しためらうような雰囲気に","音色と気分が変わる瞬間"],
-        [180,"ル・サージュ(Pf)","BS","ピアノがオーケストラのように厚く支える","2人を支える厚い響き"],
-        [240,"Cl＋Hr","WS","管2本の掛け合い","交互に歌う会話。1画面に"],
-        [310,"メイエ(Cl)","BS","2つめのメロディ。歌う部分なのでバストで","2つめの歌"],
-        [380,"3人","WS","最初の部分が戻る〜締めくくり","楽章を閉じる3人"],
-        [480,"ル・サージュ(Pf)","BS","ピアノがおとぎ話の雰囲気を作る","物語の世界を作るのはピアノ"],
-        [530,"ヴラトコヴィチ(Hr)","US","ホルンが物語を語るような短いメロディ","物語の語り手のようなホルン"],
-        [590,"メイエ(Cl)","BS","クラリネットが応える","語りへの返事"],
-        [650,"ル・サージュ(Pf)","BS","中間部のピアノ","場面転換をピアノが導く"],
-        [720,"3人","WS","物語の最初の場面が戻る。引きで全体を","おとぎ話を静かに閉じる"],
-        [780,"ヴラトコヴィチ(Hr)","US","★力強く速い楽章。ほぼずっとホルンが引っぱる","この楽章の主役。リズムの力強さを"],
-        [870,"ヴラトコヴィチ(Hr)","US","中間部1。ホルン1人の見せ場","ホルンだけが歌う場面"],
-        [950,"Cl＋Pf","WS","中間部2。クラリネットとピアノの柔らかい歌","ホルンが休み、雰囲気が柔らかく変わる"],
-        [1010,"3人","WS","力強い部分が戻って締めくくり","楽章を閉じる3人"],
-        [1080,"3人","WS","最後の楽章のメロディ","明るい最後の楽章"],
-        [1130,"メイエ(Cl)","BS","快速のメロディ。バストで指と弓を","クラリネットの指の速さ"],
-        [1190,"ヴラトコヴィチ(Hr)","US","ホルンのファンファーレ","狩りの合図のような華やかさ"],
-        [1250,"ル・サージュ(Pf)","BS","ピアノの難しい弾きどころ","ピアノの技の見せ場"],
-        [1310,"Cl＋Hr","WS","管2本が重なる。2ショットで","2つの管が重なる盛り上がり"],
-        [1370,"3人","WS","締めくくり。引きに構え、弾き終わりまで動かさない","最後の一音と拍手まで"]
+        [38,"ヴラトコヴィチ(Hr)","US","ホルンが堂々と最初のメロディを出す","曲の主役はまずホルン。堂々とした歌い出し"],
+        [103,"メイエ(Cl)","US","クラリネットが加わり、少しためらうような雰囲気に","音色と気分が変わる瞬間"],
+        [169,"ル・サージュ(Pf)","BS","ピアノがオーケストラのように厚く支える","2人を支える厚い響き"],
+        [225,"Cl＋Hr","WS","管2本の掛け合い","交互に歌う会話。1画面に"],
+        [291,"メイエ(Cl)","BS","2つめのメロディ。歌う部分なのでバストで","2つめの歌"],
+        [356,"3人","WS","最初の部分が戻る〜締めくくり","楽章を閉じる3人"],
+        [450,"ル・サージュ(Pf)","BS","ピアノがおとぎ話の雰囲気を作る","物語の世界を作るのはピアノ"],
+        [507,"ヴラトコヴィチ(Hr)","US","ホルンが物語を語るような短いメロディ","物語の語り手のようなホルン"],
+        [575,"メイエ(Cl)","BS","クラリネットが応える","語りへの返事"],
+        [644,"ル・サージュ(Pf)","BS","中間部のピアノ","場面転換をピアノが導く"],
+        [724,"3人","WS","物語の最初の場面が戻る。引きで全体を","おとぎ話を静かに閉じる"],
+        [792,"ヴラトコヴィチ(Hr)","US","★力強く速い楽章。ほぼずっとホルンが引っぱる","この楽章の主役。リズムの力強さを"],
+        [894,"ヴラトコヴィチ(Hr)","US","中間部1。ホルン1人の見せ場","ホルンだけが歌う場面"],
+        [985,"Cl＋Pf","WS","中間部2。クラリネットとピアノの柔らかい歌","ホルンが休み、雰囲気が柔らかく変わる"],
+        [1053,"3人","WS","力強い部分が戻って締めくくり","楽章を閉じる3人"],
+        [1132,"3人","WS","最後の楽章のメロディ","明るい最後の楽章"],
+        [1190,"メイエ(Cl)","BS","快速のメロディ。バストで指と弓を","クラリネットの指の速さ"],
+        [1260,"ヴラトコヴィチ(Hr)","US","ホルンのファンファーレ","狩りの合図のような華やかさ"],
+        [1330,"ル・サージュ(Pf)","BS","ピアノの難しい弾きどころ","ピアノの技の見せ場"],
+        [1400,"Cl＋Hr","WS","管2本が重なる。2ショットで","2つの管が重なる盛り上がり"],
+        [1470,"3人","WS","締めくくり。引きに構え、弾き終わりまで動かさない","最後の一音と拍手まで"]
       ]
     },
     {
       composer:"リース", title:"ピアノ五重奏曲 Op.74",
-      players:"ブロフツィン(Vn)／ラ・マルカ(Va)／チャウシャン(Vc)／シェハタ(Cb)／ル・サージュ(Pf)", dur:1680,
-      memo:"シューベルト「ます」と同じ楽器の組み合わせ（ピアノ＋バイオリン＋ビオラ＋チェロ＋コントラバス）。コントラバスが入るので画角は横に広い。ピアノの手元カットを多めに。",
+      players:"ブロフツィン(Vn)／ラ・マルカ(Va)／チャウシャン(Vc)／シェハタ(Cb)／ル・サージュ(Pf)", dur:1277,
+      memo:"シューベルト「ます」と同じ楽器の組み合わせ（ピアノ＋バイオリン＋ビオラ＋チェロ＋コントラバス）。コントラバスが入るので画角は横に広い。ピアノの手元カットを多めに。第2→第3楽章は切れ目なく続く。",
       mood:"劇的で情熱的。華やかなピアノが引っぱる。",
       intent:"ベートーヴェンの弟子のピアニストが書いた、劇的で華やかな曲。",
       camera:"主役はピアノ、手元多め。コントラバスの見せ場は珍しいので逃さない。",
-      movs:[["第1楽章（ゆっくり→速い）",0,"重い前置きから、劇的に"],["第2楽章（ややゆっくり）",660,"ゆったり歌う"],["第3楽章（同じメロディが何度も戻る）",1140,"明るいメロディが何度も戻る"]],
+      movs:[["第1楽章（ゆっくり→速い）",0,"重い前置きから、劇的に"],["第2楽章（ややゆっくり）",568,"ゆったり歌う"],["第3楽章（同じメロディが何度も戻る）",867,"明るいメロディが何度も戻る",1]],
       cues:[
         [0,"全員","WS","冒頭。5人の配置を見せる","5人は横に広い。まず全員の位置"],
-        [50,"ル・サージュ(Pf)","BS","ピアノの主役メロディ","ピアニストの曲らしく、最初の主役はピアノ"],
-        [120,"ブロフツィン(Vn)","US","バイオリンが受ける","主役がバイオリンへ"],
-        [190,"チャウシャン(Vc)","US","チェロの裏のメロディ","陰でチェロが別の歌を重ねる"],
-        [260,"ル・サージュ(Pf)","BS","速く細かい動き。手元を大きく","華やかなピアノの技"],
-        [330,"ブロフツィン(Vn)","BS","2つめのメロディ。歌う部分なのでバストで","劇的な中の歌"],
-        [400,"全員","WS","中盤。担当が細かく入れ替わるので引きで受ける","やりとりが細かい。引きで"],
-        [480,"ラ・マルカ(Va)＋シェハタ(Cb)","WS","この2人の動き。2人を1画面に","2人の動きで響きが変わる"],
-        [560,"ル・サージュ(Pf)","BS","最初のメロディが戻ってくる","冒頭の歌が戻る"],
-        [620,"全員","WS","締めくくり。引きに構え、弾き終わりまで動かさない","5人で劇的に閉じる"],
-        [660,"チャウシャン(Vc)","US","ややゆっくり。チェロの歌","静かな楽章はチェロの歌から"],
-        [750,"ブロフツィン(Vn)","US","バイオリンのメロディ","歌がバイオリンへ"],
-        [840,"ル・サージュ(Pf)","BS","ピアノの細かい飾り","ピアノが歌を飾る"],
-        [920,"ラ・マルカ(Va)","US","ビオラの歌","ビオラが歌う珍しい場面"],
-        [1000,"全員","WS","全体が高まる。引きで厚みを出す","静かな楽章の盛り上がり"],
-        [1080,"ブロフツィン(Vn)","US","静かな弾き終わり。音が消えても3秒は保持","静かに消える。余韻も音楽"],
-        [1140,"全員","WS","何度も戻ってくるメロディ。全員を引きで","何度も戻るメロディの楽章"],
-        [1190,"ル・サージュ(Pf)","BS","ピアノのメロディ","戻るメロディの持ち主"],
-        [1260,"ブロフツィン(Vn)","BS","バイオリンが応える","バイオリンの返事"],
-        [1330,"シェハタ(Cb)","US","★コントラバスの見せ場","土台のコントラバスが前に出る。逃さない"],
-        [1400,"チャウシャン(Vc)","US","チェロが音楽を前へ押し進める","チェロが曲を押し出す"],
-        [1470,"ル・サージュ(Pf)","BS","難しい速い動き","締め前のピアノの技"],
-        [1540,"全員","WS","一斉に鳴る。全員が入る引きへ戻す","5人で盛り上がる"],
-        [1610,"全員","WS","締めくくり。引きに構え、弾き終わりまで動かさない","最後の一音と拍手まで"]
+        [43,"ル・サージュ(Pf)","BS","ピアノの主役メロディ","ピアニストの曲らしく、最初の主役はピアノ"],
+        [103,"ブロフツィン(Vn)","US","バイオリンが受ける","主役がバイオリンへ"],
+        [164,"チャウシャン(Vc)","US","チェロの裏のメロディ","陰でチェロが別の歌を重ねる"],
+        [224,"ル・サージュ(Pf)","BS","速く細かい動き。手元を大きく","華やかなピアノの技"],
+        [284,"ブロフツィン(Vn)","BS","2つめのメロディ。歌う部分なのでバストで","劇的な中の歌"],
+        [344,"全員","WS","中盤。担当が細かく入れ替わるので引きで受ける","やりとりが細かい。引きで"],
+        [413,"ラ・マルカ(Va)＋シェハタ(Cb)","WS","この2人の動き。2人を1画面に","2人の動きで響きが変わる"],
+        [482,"ル・サージュ(Pf)","BS","最初のメロディが戻ってくる","冒頭の歌が戻る"],
+        [534,"全員","WS","締めくくり。引きに構え、弾き終わりまで動かさない","5人で劇的に閉じる"],
+        [568,"チャウシャン(Vc)","US","ややゆっくり。チェロの歌","静かな楽章はチェロの歌から"],
+        [624,"ブロフツィン(Vn)","US","バイオリンのメロディ","歌がバイオリンへ"],
+        [680,"ル・サージュ(Pf)","BS","ピアノの細かい飾り","ピアノが歌を飾る"],
+        [730,"ラ・マルカ(Va)","US","ビオラの歌","ビオラが歌う珍しい場面"],
+        [780,"全員","WS","全体が高まる。引きで厚みを出す","静かな楽章の盛り上がり"],
+        [830,"ブロフツィン(Vn)","US","静かな弾き終わり。音が消えても3秒は保持","静かに消える。余韻も音楽"],
+        [867,"全員","WS","何度も戻ってくるメロディ。全員を引きで","何度も戻るメロディの楽章"],
+        [905,"ル・サージュ(Pf)","BS","ピアノのメロディ","戻るメロディの持ち主"],
+        [958,"ブロフツィン(Vn)","BS","バイオリンが応える","バイオリンの返事"],
+        [1011,"シェハタ(Cb)","US","★コントラバスの見せ場","土台のコントラバスが前に出る。逃さない"],
+        [1064,"チャウシャン(Vc)","US","チェロが音楽を前へ押し進める","チェロが曲を押し出す"],
+        [1118,"ル・サージュ(Pf)","BS","難しい速い動き","締め前のピアノの技"],
+        [1171,"全員","WS","一斉に鳴る。全員が入る引きへ戻す","5人で盛り上がる"],
+        [1224,"全員","WS","締めくくり。引きに構え、弾き終わりまで動かさない","最後の一音と拍手まで"]
       ]
     },
     {
@@ -890,7 +900,7 @@ if(!String.prototype.padStart){String.prototype.padStart=function(n,p){
   var s=String(this);p=p===undefined?" ":String(p);
   while(s.length<n){s=p+s;}return s.slice(-Math.max(n,s.length));};}
 
-var S={view:"home",d:0,p:0,started:null,pausedAt:0,running:false,dim:false,list:false,ci:-99,mi:0,wait:false,pw:false,w0:0};
+var S={view:"home",d:0,p:0,started:null,pausedAt:0,running:false,dim:false,list:false,ci:-99,mi:0,wait:false,pw:false,w0:0,done:false,hold:false,pk:-1};
 try{var _s=localStorage.getItem("lepont26");if(_s){var _o=JSON.parse(_s);
   S.d=_o.d||0;S.dim=!!_o.dim;S.list=!!_o.list;}}catch(e){}
 function save(){try{localStorage.setItem("lepont26",
@@ -905,6 +915,10 @@ function el(){
   var pc=piece(),m=movIdx(pc,t),nx;
   while(S.mi<m&&pc.movs[S.mi+1]&&pc.movs[S.mi+1][3])S.mi++;
   nx=pc.movs[S.mi+1];
+  if(micActive()){S.hold=false;
+    if(S.wait)return nx?nx[1]-0.05:t;
+    if(nx&&!nx[3]&&t>=nx[1]){S.hold=true;return nx[1]-0.05;}
+    return t;}
   if(nx&&!nx[3]&&t>=nx[1]){S.wait=true;return nx[1]-0.05;}
   S.wait=false;return t;
 }
@@ -915,6 +929,226 @@ function movOf(pc,t){var n=pc.movs[0][0];
   for(var i=0;i<pc.movs.length;i++){if(pc.movs[i][1]<=t)n=pc.movs[i][0];}return n;}
 function idxAt(pc,t){var ci=-1;
   for(var i=0;i<pc.cues.length;i++){if(pc.cues[i][0]<=t)ci=i;}return ci;}
+
+/* マイクで自動合わせ：音の特徴（AnalyserNode のデータから） */
+if(!Math.log10)Math.log10=function(x){return Math.log(x)/Math.LN10;};
+function micFeat(db, td, sr, fft) {
+  var i, s = 0, n = td.length;
+  for (i = 0; i < n; i++) s += td[i] * td[i];
+  var lvl = 10 * Math.log10(s / n + 1e-12);
+  var bw = sr / fft, k0 = Math.round(150 / bw), k1 = Math.round(1000 / bw), k2 = Math.round(4000 / bw), k3 = Math.min(Math.round(10000 / bw), db.length - 1);
+  var p = [], b1 = 0, b2 = 0, b3 = 0, lg = 0, cnt = 0, v;
+  for (i = k0; i <= k3; i++) { v = Math.pow(10, db[i] / 10); p[i] = v;
+    if (i < k1) b1 += v; else if (i < k2) b2 += v; else b3 += v;
+    if (i < k2) { lg += Math.log(v + 1e-30); cnt++; } }
+  var am = (b1 + b2) / cnt, flat = Math.exp(lg / cnt) / (am + 1e-30);
+  // tonal peaks: bins > both neighbours and > 10dB above the local average (+-8 bins)
+  var pk = 0, j, loc, m;
+  for (i = k0 + 8; i < k2 - 8; i++) {
+    if (db[i] > db[i - 1] && db[i] >= db[i + 1]) {
+      loc = 0; m = 0; for (j = i - 8; j <= i + 8; j++) { if (j < i - 1 || j > i + 1) { loc += p[j]; m++; } }
+      if (db[i] - 10 * Math.log10(loc / m + 1e-30) > 10) pk += p[i - 1] + p[i] + p[i + 1];
+    }
+  }
+  return { lvl: lvl, b1: 10 * Math.log10(b1 + 1e-30), b2: 10 * Math.log10(b2 + 1e-30), b3: 10 * Math.log10(b3 + 1e-30),
+           flat: flat, ton: pk / (b1 + b2 + 1e-30) };
+}
+
+/* 状態の判定（演奏・静か・拍手 → 開始／楽章の間／次の楽章／曲の終わり）。検証: 9/16・9/17の3台分の録音で全楽章の頭を±2秒で検出 */
+function MicSync(pieceMovs, opt) { this.opt = opt || {}; this.setPiece(pieceMovs); this.hist = []; this.lvls = []; this.lastAppl = -1e9; this.armed = false; this.fr = []; }
+MicSync.prototype.P = function (k, v) { return this.opt[k] != null ? this.opt[k] : v; };
+MicSync.prototype.nextPiece = function (movs, t) { this.ignoreAppl = t; this.lastAppl = -1e9; this.setPiece(movs); };
+MicSync.prototype.setPiece = function (movs) { // movs: [{st:planStart, len:planLen, att:bool}]
+  this.movs = movs; this.st = "armed"; this.m = 0; this.onset = null; this.cand = null; this.sil0 = null; this.app0 = null; this.wait = false; this.prov = false; };
+MicSync.prototype.emit = function (ev) { if (this.on) this.on(ev); };
+MicSync.prototype.frame = function (f, t) {
+  // --- frame classification (smoothed over 1 s) ---
+  var band = 10 * Math.log10(Math.pow(10, f.b1 / 10) + Math.pow(10, f.b2 / 10));
+  this.fr.push({ t: t, ton: f.ton, band: band, br: f.b2 - f.b1 }); if (this.fr.length > 10) this.fr.shift();
+  var i, nt = 0, bands = [], brs = [];
+  for (i = 0; i < this.fr.length; i++) { if (this.fr[i].ton > this.P("tonF", 0.25)) nt++; bands.push(this.fr[i].band); brs.push(this.fr[i].br); }
+  bands.sort(function (a, b) { return a - b; }); brs.sort(function (a, b) { return a - b; });
+  var bmed = bands[bands.length >> 1], brmed = brs[brs.length >> 1];
+  // background: follows quiet moments down at once, rises slowly (0.005 dB/s)
+  if (bmed > -110) { if (this.bg == null || bmed < this.bg) this.bg = bmed; else if (this.lastT != null) this.bg += this.P("bgRise", 0.005) * (t - this.lastT); }
+  this.lastT = t;
+  var music = nt >= this.P("tonN", 4) && bmed >= this.bg + this.P("musDb", 4);
+  var appl = !music && bmed >= this.bg + this.P("applDb", 12) && brmed > this.P("applBr", -3);
+  this.music = music; this.appl = appl; this.lvl = bmed; this.floor = this.bg;
+  // applause run
+  if (appl) { if (this.app0 == null) this.app0 = t; } else if (this.app0 != null && t - this.appEnd > 0.8) { this.app0 = null; }
+  if (appl) this.appEnd = t;
+  var aDur = this.app0 != null ? t - this.app0 : 0;
+  if (aDur >= 3 && !(this.ignoreAppl && this.app0 <= this.ignoreAppl)) { this.lastAppl = t; }
+  if (!appl && this.ignoreAppl && this.app0 == null && t - (this.appEnd || 0) > 5 && this.appEnd >= this.ignoreAppl) this.ignoreAppl = null;
+  // music run (continuous, tolerate <=0.6 s dropouts)
+  if (music) { if (this.run0 == null) this.run0 = t; this.runEnd = t; } else if (this.run0 != null && t - this.runEnd > this.P("drop", 0.6)) this.run0 = null;
+  var runDur = this.run0 != null ? t - this.run0 : 0;
+  // silence run (non-music), measured from last music frame
+  var silDur = music ? 0 : t - (this.runEnd || t);
+  this.silDur = silDur; this.aDur = aDur;
+  if (!this.hold) this.step(t, runDur, silDur, aDur);
+};
+// sync from the app after a manual action. st: "armed" | "play" | "gap" | "end"
+MicSync.prototype.setPos = function (st, m, onset, t) {
+  this.st = st; this.m = m || 0; this.prov = false;
+  if (st === "play") this.onset = onset;
+  if (st === "armed") { this.lastAppl = t; this.ignoreAppl = null; }
+};
+MicSync.prototype.step = function (t, runDur, silDur, aDur) {
+  var M = this.movs, last = this.m >= M.length - 1, ON = this.P("onSec", 4);
+  if (this.st === "armed") {
+    var armedOK = t - this.lastAppl < this.P("armWin", 600);
+    if (armedOK && runDur >= ON) { this.st = "play"; this.m = 0; this.onset = this.run0; this.prov = true; this.emit({ e: "start", m: 0, onset: this.onset }); }
+    return;
+  }
+  if (this.st === "gap") { // waiting for the next movement (m = next)
+    if (aDur >= this.P("applEnd", 20)) { this.st = "end"; this.emit({ e: "end", m: this.m - 1, why: "appl-gap" }); return; }
+    if (runDur >= ON) { this.st = "play"; this.onset = this.run0; this.prov = true; this.emit({ e: "mov", m: this.m, onset: this.onset }); }
+    return;
+  }
+  if (this.st !== "play") return;
+  var e = t - this.onset;
+  // provisional start: silence >=3 s within the first 15 s -> re-anchor
+  if (this.prov && e - silDur > Math.min(this.P("provSec", 30), 0.5 * M[this.m].len)) this.prov = false;
+  if (this.prov && silDur >= this.P("provSil", 5)) {
+    this.emit({ e: "reanchor", m: this.m });
+    if (this.m === 0) { this.st = "armed"; } else { this.st = "gap"; }
+    return;
+  }
+  // applause handling
+  var early = this.m === 0 && e < Math.min(0.7 * M[0].len, Math.max(200, 0.5 * M[0].len));
+  if (early && aDur > 0) { if (aDur >= 5) { this.st = "armed"; this.lastAppl = t; this.emit({ e: "reset" }); } return; }
+  if (aDur >= this.P("applEnd", 20) || (last && aDur >= 3 && e >= 0.3 * M[this.m].len)) { this.st = "end"; this.emit({ e: "end", m: this.m }); return; }
+  if (last) { if (silDur >= 15 && e >= 0.6 * M[this.m].len) { this.st = "end"; this.emit({ e: "end", m: this.m, why: "sil" }); } return; }
+  // gap scoring for movement boundaries
+  var eAtStop = e - silDur, r = eAtStop / M[this.m].len;
+  var nextAtt = M[this.m + 1] && M[this.m + 1].att;
+  if (nextAtt) { // attacca: advance when plan time passes the boundary
+    if (e >= M[this.m].len) { this.m++; this.onset = this.onset + M[this.m - 1].len; this.emit({ e: "mov", m: this.m, onset: this.onset, att: 1 }); }
+    return;
+  }
+  var odds = gapOdds(silDur, r, aDur);
+  if (odds >= 1) {
+    this.st = "gap"; this.m++; this.emit({ e: "wait", m: this.m, r: r, g: silDur });
+  }
+};
+function gapOdds(g, r, a) {
+  if (g < 3) return 0;
+  var G = g < 4 ? 0.15 : g < 5 ? 0.6 : g < 6 ? 1 : g < 8 ? 2 : g < 12 ? 4 : 20;
+  var H = r < 0.35 ? 0.01 : r < 0.5 ? 0.05 : r < 0.6 ? 0.15 : r < 0.7 ? 0.4 : r < 0.85 ? 1.5 : 5;
+  if (a >= 2) G *= 5;
+  return G * H;
+}
+if (typeof module !== "undefined") module.exports = { MicSync: MicSync, gapOdds: gapOdds, micFeat: micFeat };
+
+/* ---------- マイクで自動合わせ（アプリ側） ---------- */
+var MIC={want:true,on:false,busy:false,err:"",ctx:null,an:null,src:null,stream:null,tmr:null,sync:null,fd:null,td:null};
+try{if(localStorage.getItem("lepont26mic")==="0")MIC.want=false;}catch(e){}
+function micActive(){return MIC.on&&!!MIC.sync;}
+function micMovs(pc){var r=[],i,st,en;for(i=0;i<pc.movs.length;i++){st=pc.movs[i][1];
+  en=i+1<pc.movs.length?pc.movs[i+1][1]:pc.dur;r.push({st:st,len:Math.max(30,en-st),att:!!pc.movs[i][3]});}return r;}
+function micFail(msg){MIC.busy=false;MIC.err=msg;micStop();paintMic();}
+function micStart(){
+  if(MIC.on||MIC.busy)return;
+  var AC=window.AudioContext||window.webkitAudioContext,pr;
+  if(!AC||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){micFail("この端末ではマイクが使えません（手動で操作）");return;}
+  MIC.busy=true;MIC.err="";paintMic();
+  try{if(!MIC.ctx)MIC.ctx=new AC();if(MIC.ctx.resume)MIC.ctx.resume();}catch(e){micFail("マイクを開始できません（タップで再試行）");return;}
+  try{pr=navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});}
+  catch(e){micFail("マイクを開始できません（タップで再試行）");return;}
+  pr.then(function(stream){
+    MIC.busy=false;MIC.stream=stream;
+    try{var ctx=MIC.ctx,src=ctx.createMediaStreamSource(stream),an=ctx.createAnalyser(),g=ctx.createGain();
+      an.fftSize=4096;an.smoothingTimeConstant=0;g.gain.value=0;
+      src.connect(an);an.connect(g);g.connect(ctx.destination);
+      MIC.src=src;MIC.an=an;MIC.fd=new Float32Array(an.frequencyBinCount);MIC.td=new Float32Array(an.fftSize);
+    }catch(e){micFail("マイクを開始できません（タップで再試行）");return;}
+    if(!MIC.sync){MIC.sync=new MicSync(micMovs(piece()),{});MIC.sync.on=micEvent;}
+    MIC.on=true;micSyncFromApp();
+    var tr=stream.getAudioTracks(),i;
+    for(i=0;i<tr.length;i++)tr[i].onended=function(){if(MIC.on)micFail("マイクが止まりました（タップで再開）");};
+    if(MIC.tmr)clearInterval(MIC.tmr);MIC.tmr=setInterval(micFrame,100);
+    if(S.running)playVid();
+    render();
+  },function(){micFail("マイクが許可されていません（タップで再試行）");});
+}
+function micStop(){
+  MIC.on=false;if(MIC.tmr){clearInterval(MIC.tmr);MIC.tmr=null;}
+  try{if(MIC.src)MIC.src.disconnect();}catch(e){}
+  try{if(MIC.stream){var tr=MIC.stream.getTracks(),i;for(i=0;i<tr.length;i++)tr[i].stop();}}catch(e){}
+  MIC.stream=null;MIC.src=null;MIC.an=null;
+}
+function micToggle(){
+  if(MIC.on){if(!confirm("マイクの自動合わせを止めますか？（止めても手動で使えます）"))return;
+    micStop();MIC.want=false;S.done=false;S.hold=false;}
+  else{MIC.want=true;micStart();}
+  try{localStorage.setItem("lepont26mic",MIC.want?"1":"0");}catch(e){}
+  render();
+}
+function micFrame(){
+  if(!MIC.on||!MIC.an)return;
+  try{if(MIC.ctx.state==="suspended"||MIC.ctx.state==="interrupted")MIC.ctx.resume();}catch(e){}
+  MIC.an.getFloatFrequencyData(MIC.fd);
+  if(MIC.an.getFloatTimeDomainData)MIC.an.getFloatTimeDomainData(MIC.td);
+  else{if(!MIC.bd)MIC.bd=new Uint8Array(MIC.an.fftSize);MIC.an.getByteTimeDomainData(MIC.bd);
+    for(var i=0;i<MIC.bd.length;i++)MIC.td[i]=(MIC.bd[i]-128)/128;}
+  var f=micFeat(MIC.fd,MIC.td,MIC.ctx.sampleRate,MIC.an.fftSize);
+  // 音がまったく届かない（無音の0が続く）＝マイクが止まった。会場の「静か」は0にはならない
+  MIC.dead=(f.b1<-250&&f.b2<-250)?(MIC.dead||0)+1:0;
+  if(MIC.dead>=50){micFail("マイクの音が届いていません（タップで再開）");render();return;}
+  MIC.sync.hold=(S.view!=="cue")||(!S.running&&S.pausedAt>0&&!S.wait&&!S.done);
+  MIC.sync.frame(f,Date.now()/1000);
+  paintMicLive();
+}
+function micSyncFromApp(){
+  if(!MIC.sync||S.view!=="cue")return;
+  var pc=piece(),now=Date.now()/1000;
+  if(S.done)MIC.sync.setPos("end",S.mi,0,now);
+  else if(!S.running&&S.pausedAt===0)MIC.sync.setPos("armed",0,0,now);
+  else if(S.wait)MIC.sync.setPos("gap",S.mi+1,0,now);
+  else MIC.sync.setPos("play",S.mi,(S.running?S.started/1000:now-S.pausedAt)+pc.movs[S.mi][1],now);
+}
+function micEvent(ev){
+  if(S.view!=="cue")return;
+  var pc=piece();
+  if(ev.e==="start"){
+    S.mi=0;S.wait=false;S.done=false;S.running=true;S.pausedAt=0;S.started=ev.onset*1000;
+    S.w0=0;logEv("start",0,0,1,ev.onset*1000);lockScreen();render();
+  }else if(ev.e==="mov"){if(!pc.movs[ev.m])return;
+    S.mi=ev.m;S.wait=false;S.running=true;S.started=ev.onset*1000-pc.movs[ev.m][1]*1000;
+    logEv("mov",ev.m,pc.movs[ev.m][1],1,ev.onset*1000);render();
+  }else if(ev.e==="wait"||(ev.e==="reanchor"&&ev.m>0)){if(!pc.movs[ev.m])return;
+    S.mi=ev.m-1;S.wait=true;render();
+  }else if(ev.e==="reanchor"||ev.e==="reset"){
+    S.running=false;S.pausedAt=0;S.started=null;S.mi=0;S.wait=false;S.w0=0;logEv("redo",0,0,1);render();
+  }else if(ev.e==="end"){
+    S.done=true;S.wait=false;S.hold=false;logEv("end",S.mi,el(),1);S.w0=0;render();
+    setTimeout(function(){if(S.done&&S.view==="cue"&&S.p<DATA[S.d].pieces.length-1)openPiece(S.p+1,true);},5000);
+  }
+}
+function micWord(){var y=MIC.sync;if(!y||y.lvl==null)return "…";return y.appl?"拍手":(y.music?"演奏の音":"静か");}
+function micLv(){var y=MIC.sync;if(!y||y.lvl==null||y.floor==null)return 0;return Math.max(0,Math.min(100,(y.lvl-y.floor)*2.5));}
+function micInner(){
+  if(MIC.on)return '<span class="mk on">\uD83C\uDFA4</span><span class="ms" id="mic_s">自動合わせ中｜'+micWord()+
+    '</span><i class="lv"><b id="mic_l" style="width:'+micLv()+'%"></b></i>';
+  if(MIC.busy)return '<span class="mk">\uD83C\uDFA4</span><span class="ms">マイクを準備中…「許可」を押してください</span>';
+  if(MIC.err)return '<span class="mk ng">\uD83C\uDFA4</span><span class="ms">'+esc(MIC.err)+'</span>';
+  return '<span class="mk">\uD83C\uDFA4</span><span class="ms">自動合わせ：オフ（タップでオン）</span>';
+}
+function micHTML(){return '<button class="mic" id="mic" onclick="micToggle()">'+micInner()+'</button>';}
+function paintMic(){var e=document.getElementById("mic");if(e)e.innerHTML=micInner();}
+function paintMicLive(){var s=document.getElementById("mic_s"),l=document.getElementById("mic_l");
+  if(s)s.textContent="自動合わせ中｜"+micWord();if(l)l.style.width=micLv()+"%";}
+document.addEventListener("visibilitychange",function(){
+  if(document.visibilityState==="visible"&&MIC.on&&MIC.ctx){try{MIC.ctx.resume();}catch(e){}}});
+function stInfo(){
+  if(S.done)return ["","終わり"];
+  if(S.wait)return [" wait",micActive()?"楽章の間":"待機中"];
+  if(S.running)return [" run","進行中"];
+  if(micActive()&&S.pausedAt===0)return [" armed","音待ち"];
+  return ["","停止"];
+}
 
 var wl=null,nsv=null;
 var NOSLEEP_WEBM="data:video/webm;base64,GkXfo59ChoEBQveBAULygQRC84EIQoKEd2VibUKHgQJChYECGFOAZwEAAAAAAAHpEU2bdLpNu4tTq4QVSalmU6yBoU27i1OrhBZUrmtTrIHYTbuMU6uEElTDZ1OsggEeTbuMU6uEHFO7a1OsggHT7AEAAAAAAABZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVSalmsirXsYMPQkBNgI1MYXZmNjAuMTYuMTAwV0GNTGF2ZjYwLjE2LjEwMESJiECPQAAAAAAAFlSua8GuAQAAAAAAADjXgQFzxYhfM/u4liwdSZyBACK1nIN1bmSIgQCGhVZfVlA4g4EBI+ODhDuaygDgibCBQLqBQJqBAhJUw2f8c3OgY8CAZ8iaRaOHRU5DT0RFUkSHjUxhdmY2MC4xNi4xMDBzc9ZjwItjxYhfM/u4liwdSWfIoUWjh0VOQ09ERVJEh5RMYXZjNjAuMzEuMTAyIGxpYnZweGfIoUWjiERVUkFUSU9ORIeTMDA6MDA6MDEuMDAwMDAwMDAwAB9DtnWv54EAo6qBAACA8AIAnQEqQABAAABHCIWFiJmEiAKCAAZwPEJgCrIg9zAA/v+PvAAcU7trkbuPs4EAt4r3gQHxggGf8IED";
@@ -999,8 +1233,9 @@ function home(){
      '<div class="r"><b>寄りの目安</b><div><span style="color:var(--us)">アップ</span>＝顔と手元　'+
      '<span style="color:var(--bs)">バスト</span>＝胸から上・楽器込み　'+
      '<span style="color:var(--ws)">引き</span>＝2人以上・全体</div></div></div>';
-  h+='<div class="foot">・タイマーは曲ごとに0から使います。曲の最初の音が鳴った瞬間に［開始］を押してください（入場・おじぎ・音合わせでは押さない）。<br>'+
-     '・楽章の終わりでタイマーは自動で止まります（待機中）。次の楽章の最初の音で［次の楽章］を押すと合います。楽章が先に始まった時も同じボタン。<br>・楽章の途中のズレは［次へ／前へ］［−5秒／＋5秒］で。<br>・押したタイミングは自動で記録されます。終演後に「実測の記録」をコピーして送ってください。<br>'+
+  h+='<div class="foot">・曲を開くとマイクで自動合わせが始まります（「許可」を押す）。最初の音で自動で開始、楽章の間は待機、次の楽章の音で自動で進み、曲が終わると次の曲に切り替わります。<br>'+
+     '・始まらない時は［開始］、楽章がずれた時は［次の楽章］、細かいずれは［次へ／前へ］で直せます。🎤の行をタップすると自動合わせを止められます。<br>'+
+     '・楽章の途中の指示は目安です（楽譜ではなく録音の長さから推定）。<br>・タイミングは自動で記録されます。終演後に「実測の記録」をコピーして送ってください。<br>'+
      '・★印は外してはいけない見せ場です。<br>'+
      '・上の表示が緑になった後は、機内モードでも動きます。<br>'+
      '・［開始］中は画面が消えないようにしていますが、確実を期すなら 設定 → 画面表示と明るさ → 自動ロック → なし に設定してください。<br>'+
@@ -1091,7 +1326,8 @@ function lineupHTML(pc){
   return '<div class="lineup" id="lineup"><div class="lh">この曲について</div><div class="ab">'+
     '<div><b>雰囲気</b>'+esc(pc.mood||"")+'</div><div><b>内容</b>'+esc(pc.intent||"")+'</div>'+
     '<div><b>撮り方</b>'+esc(pc.camera||"")+'</div></div><div class="lh">この曲の出演者</div>'+
-    '<div class="lh2">入場したら、顔と座る位置をここで確認。最初の音が鳴ったら［開始］（入場・おじぎ・音合わせでは押さない）。</div>'+
+    '<div class="lh2">入場したら、顔と座る位置をここで確認。'+(micActive()?'最初の音で自動で始まります（始まらない時だけ［開始］）。':
+      '最初の音が鳴ったら［開始］（入場・おじぎ・音合わせでは押さない）。')+'</div>'+
     stripHTML(roster(pc))+'</div>';}
 function dayRoster(d){var seen={},i,j,ro,out=[];
   for(i=0;i<d.pieces.length;i++){ro=roster(d.pieces[i]);
@@ -1099,7 +1335,11 @@ function dayRoster(d){var seen={},i,j,ro,out=[];
   for(i=0;i<ORDER.length;i++)if(seen[ORDER[i]])out.push({name:ORDER[i],inst:seen[ORDER[i]]});
   return out;}
 function nowHTML(pc,ci){
-  if(ci<0)return '<div class="now" id="now"><div class="who" style="font-size:21px;color:var(--sub)">'+
+  if(S.done)return '<div class="now" id="now"><div class="who" style="font-size:21px;color:var(--sub)">曲が終わりました</div>'+
+    '<div class="nt">'+(S.p<DATA[S.d].pieces.length-1?'まもなく次の曲の画面に切り替わります。':'この日の曲はこれで終わりです。')+'</div></div>';
+  if(ci<0)return micActive()?'<div class="now" id="now"><div class="who" style="font-size:21px;color:var(--sub)">'+
+    '音が鳴ると自動で始まります</div><div class="nt">始まらない時だけ［開始］を押してください。</div></div>':
+    '<div class="now" id="now"><div class="who" style="font-size:21px;color:var(--sub)">'+
     '最初の音で［開始］</div><div class="nt">入場・おじぎ・音合わせでは押さないでください。</div></div>';
   var c=pc.cues[ci],k=sc(c[2]),body="",p,j;
   if(allNamed(c[1])){
@@ -1119,12 +1359,16 @@ function nowHTML(pc,ci){
     (c[4]?'<div class="why"><b>なぜ</b>'+esc(c[4])+'</div>':'')+'</div>';
 }
 function nextHTML(pc,ci,t){
-  if(S.wait&&pc.movs[S.mi+1]){var mv=pc.movs[S.mi+1],fc=null,k;
+  if(S.done)return '<div class="next" id="nx"><div class="cd" id="cd">終</div>'+
+    '<div class="tx"><b>拍手の間も回し続ける</b><span>次の曲は自動で待ち受けます</span></div></div>';
+  if(S.wait&&pc.movs[S.mi+1]){var mv=pc.movs[S.mi+1],fc=null,k,ma=micActive();
     for(k=0;k<pc.cues.length;k++){if(pc.cues[k][0]>=mv[1]){fc=pc.cues[k];break;}}
     return '<div class="next wait" id="nx"><div class="cd" id="cd">待機</div>'+
-      '<div class="tx"><b>次の楽章の最初の音で［次の楽章］</b>'+
+      '<div class="tx"><b>'+(ma?'楽章の間（音が鳴ると自動で次へ）':'次の楽章の最初の音で［次の楽章］')+'</b>'+
       '<div class="nw">'+(fc?minis(pc,fc[1],3):"")+'<div class="nn">'+esc(mv[0])+'</div></div>'+
-      '<span>楽章の間はタイマーを自動で止めています</span></div></div>';}
+      '<span>'+(ma?'ずれた時は［次の楽章］で直せます':'楽章の間はタイマーを自動で止めています')+'</span></div></div>';}
+  if(S.hold)return '<div class="next" id="nx"><div class="cd" id="cd">…</div>'+
+    '<div class="tx"><b>この楽章がまだ続いています</b><span>終わると自動で次の楽章へ進みます</span></div></div>';
   var n=pc.cues[ci+1];
   if(!n)return '<div class="next" id="nx"><div class="cd" id="cd">終</div>'+
     '<div class="tx"><b>最後のキューです</b><span>拍手が終わるまで回し続ける</span></div></div>';
@@ -1168,8 +1412,8 @@ function cuepage(){
     (pc.memo?'<div class="memo">'+esc(pc.memo)+'</div>':'')+'</div>'+
     '<div class="clock"><div class="big" id="clk">'+mmss(t)+'</div>'+
     '<div class="tot">/ 約'+mmss(pc.dur)+'</div>'+
-    '<div class="st'+(S.wait?" wait":(S.running?" run":""))+'" id="st">'+(S.wait?"待機中":(S.running?"進行中":"停止"))+'</div></div>'+
-    '<div class="bar"><i id="bar" style="width:'+Math.min(100,t/pc.dur*100)+'%"></i></div>'+
+    '<div class="st'+stInfo()[0]+'" id="st">'+stInfo()[1]+'</div></div>'+
+    '<div class="bar"><i id="bar" style="width:'+Math.min(100,t/pc.dur*100)+'%"></i></div>'+micHTML()+
     (!S.running&&S.pausedAt===0?lineupHTML(pc):"")+
     nowHTML(pc,ci)+nextHTML(pc,ci,t)+(S.list?listHTML(pc,ci):upHTML(pc,ci))+
     '<div class="ctl"><div class="row">'+
@@ -1193,9 +1437,9 @@ function tick(){
   var clk=g("clk");if(!clk)return;
   clk.textContent=mmss(t);
   g("bar").style.width=Math.min(100,t/pc.dur*100)+"%";
-  var st=g("st");st.textContent=S.wait?"待機中":(S.running?"進行中":"停止");
-  st.className="st"+(S.wait?" wait":(S.running?" run":""));
-  if(S.wait!==S.pw){S.pw=S.wait;var nxe=g("nx");if(nxe)nxe.outerHTML=nextHTML(pc,ci,t);}
+  var st=g("st"),si=stInfo();st.textContent=si[1];st.className="st"+si[0];
+  var key=(S.wait?1:0)+(S.hold?2:0)+(S.done?4:0);
+  if(key!==S.pk){S.pk=key;var nxe=g("nx");if(nxe)nxe.outerHTML=nextHTML(pc,ci,t);}
   var mb=g("mvb");if(mb)mb.className=mvbClass(pc);
   var rb=g("runb");rb.textContent=S.running?"一時停止":(S.pausedAt>0?"再開":"開始");
   rb.className="btn "+(S.running?"stop":"go");
@@ -1216,7 +1460,7 @@ function tick(){
     }
   }else{
     var n=pc.cues[ci+1];
-    if(n&&!S.wait){var left=n[0]-t;
+    if(n&&!S.wait&&!S.hold&&!S.done){var left=n[0]-t;
       g("cd").textContent=left>=0?"あと"+Math.ceil(left)+"秒":"—";
       g("nx").className="next"+(left<=10?" soon":"");}
   }
@@ -1227,43 +1471,48 @@ function render(){S.ci=-99;document.getElementById("app").innerHTML=
   (S.view==="home"?home():cuepage());document.body.className=S.dim?"dim":"";
   if(S.view==="home")paintOff();}
 function setDay(i){S.d=i;save();render();window.scrollTo(0,0);}
-function openPiece(j){if(S.w0)logEv("end",S.mi,el());
+function openPiece(j,auto){if(S.w0)logEv("end",S.mi,el());
   S.p=j;S.view="cue";S.started=null;S.pausedAt=0;S.running=false;S.mi=0;S.wait=false;S.pw=false;S.w0=0;
+  S.done=false;S.hold=false;S.pk=-1;
+  if(MIC.sync){if(auto)MIC.sync.nextPiece(micMovs(piece()),Date.now()/1000);
+    else{MIC.sync.setPiece(micMovs(piece()));micSyncFromApp();}}
+  if(MIC.want&&!MIC.on&&!MIC.busy&&!auto)micStart();
   render();window.scrollTo(0,0);}
-function goHome(){if(S.w0){logEv("end",S.mi,el());S.w0=0;}S.view="home";S.running=false;unlockScreen();render();window.scrollTo(0,0);}
+function goHome(){if(S.w0){logEv("end",S.mi,el());S.w0=0;}S.view="home";S.running=false;S.done=false;unlockScreen();render();window.scrollTo(0,0);}
 function toggleDim(){S.dim=!S.dim;save();document.body.className=S.dim?"dim":"";
   render();}
 function toggleList(){S.list=!S.list;save();render();}
 function toggleRun(){
   if(S.running){S.pausedAt=el();S.running=false;unlockScreen();}
   else{if(S.pausedAt===0&&!S.w0)logEv("start",0,0);
-    S.started=Date.now()-S.pausedAt*1000;S.running=true;lockScreen();}
-  render();}
+    S.started=Date.now()-S.pausedAt*1000;S.running=true;S.done=false;lockScreen();}
+  micSyncFromApp();render();}
 function reset(){if(!confirm("この曲のタイマーを0に戻しますか？"))return;
-  S.started=null;S.pausedAt=0;S.running=false;S.mi=0;S.wait=false;S.w0=0;unlockScreen();render();}
+  S.started=null;S.pausedAt=0;S.running=false;S.mi=0;S.wait=false;S.w0=0;S.done=false;S.hold=false;
+  unlockScreen();micSyncFromApp();render();}
 function setT(t){t=Math.max(0,t);S.pausedAt=t;
   if(S.running)S.started=Date.now()-t*1000;
-  S.mi=movIdx(piece(),t);S.wait=false;
-  tick();}
+  S.mi=movIdx(piece(),t);S.wait=false;S.done=false;
+  micSyncFromApp();tick();}
 function mvbClass(pc){if(pc.movs.length<2||S.mi>=pc.movs.length-1)return "btn mv off";
   return "btn mv"+(S.wait?" on":" ready");}
 function nextMov(){var pc=piece(),m=S.mi+1;if(m>=pc.movs.length)return;
   logEv("mov",m,pc.movs[m][1]);
   if(!S.running){S.running=true;lockScreen();}
   setT(pc.movs[m][1]);render();}
-function logEv(ev,m,plan){try{
-  var L=JSON.parse(localStorage.getItem("lepont26log")||"[]"),now=Date.now(),dt=new Date(now);
+function logEv(ev,m,plan,how,atMs){try{
+  var L=JSON.parse(localStorage.getItem("lepont26log")||"[]"),now=atMs||Date.now(),dt=new Date(now);
   if(ev==="start")S.w0=now;
   var z=function(v){return (v<10?"0":"")+v;};
   L.push({d:DATA[S.d].date,p:S.p,ev:ev,m:m,plan:Math.round(plan*10)/10,
-    s:S.w0?Math.round((now-S.w0)/100)/10:0,at:z(dt.getHours())+":"+z(dt.getMinutes())+":"+z(dt.getSeconds())});
+    s:S.w0?Math.round((now-S.w0)/100)/10:0,at:z(dt.getHours())+":"+z(dt.getMinutes())+":"+z(dt.getSeconds()),a:how?1:0});
   localStorage.setItem("lepont26log",JSON.stringify(L));}catch(e){}}
 function logCount(){try{return JSON.parse(localStorage.getItem("lepont26log")||"[]").length;}catch(e){return 0;}}
-function showLog(){var L=[],i,x,N={start:"開始",mov:"次の楽章",step:"次へ/前へ",end:"曲を離れた"};
+function showLog(){var L=[],i,x,N={start:"開始",mov:"次の楽章",step:"次へ/前へ",end:"曲の終わり",redo:"開始やり直し"};
   try{L=JSON.parse(localStorage.getItem("lepont26log")||"[]");}catch(e){}
-  var tx="日付\t曲\t出来事\t楽章\t予定秒\t実際秒\t時刻\n";
+  var tx="日付\t曲\t出来事\t楽章\t予定秒\t実際秒\t時刻\t操作\n";
   for(i=0;i<L.length;i++){x=L[i];tx+=x.d+"\t"+(x.p+1)+"\t"+(N[x.ev]||x.ev)+"\t"+(x.ev==="mov"?(x.m+1):"")+
-    "\t"+x.plan+"\t"+x.s+"\t"+x.at+"\n";}
+    "\t"+x.plan+"\t"+x.s+"\t"+x.at+"\t"+(x.a?"自動":"手動")+"\n";}
   var o=document.createElement("div");o.className="logv";o.id="logv";
   o.innerHTML='<b style="color:var(--accent);font-size:15px">実測の記録（'+L.length+'件）</b>'+
     '<div class="lg">終演後に「全部コピー」して送ってください。次の公演の時間合わせに使います。</div>'+
