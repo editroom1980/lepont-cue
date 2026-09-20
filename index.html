@@ -1138,6 +1138,9 @@ if (typeof module !== "undefined") module.exports = { MicSync: MicSync, gapOdds:
 var MIC={want:true,on:false,busy:false,err:"",ctx:null,an:null,src:null,stream:null,tmr:null,sync:null,fd:null,td:null};
 try{if(localStorage.getItem("lepont26mic")==="0")MIC.want=false;}catch(e){}
 function micActive(){return MIC.on&&!!MIC.sync;}
+/* 入れ物アプリ（ジンバル操作など）がいれば指示を渡す。ふつうのSafariでは何もしない */
+function bridge(k,d){try{var w=window.webkit;
+  if(w&&w.messageHandlers&&w.messageHandlers.cue)w.messageHandlers.cue.postMessage({k:k,d:d});}catch(e){}}
 function micOpt(pc){return {noRe:!!pc.quiet};}
 function micMovs(pc){var r=[],i,st,en;for(i=0;i<pc.movs.length;i++){st=pc.movs[i][1];
   en=i+1<pc.movs.length?pc.movs[i+1][1]:pc.dur;r.push({st:st,len:Math.max(30,en-st),att:!!pc.movs[i][3]});}return r;}
@@ -1207,17 +1210,20 @@ function micEvent(ev){
   var pc=piece();
   if(ev.e==="start"){
     S.mi=0;S.wait=false;S.done=false;S.running=true;S.pausedAt=0;S.started=ev.onset*1000;
-    S.w0=0;S.cue=0;S.shift=0;S.why="";logEv("start",0,0,1,ev.onset*1000);lockScreen();render();
+    S.w0=0;S.cue=0;S.shift=0;S.why="";logEv("start",0,0,1,ev.onset*1000);
+    bridge("start",{day:DATA[S.d].date,piece:S.p,title:pc.title});lockScreen();render();
   }else if(ev.e==="mov"){if(!pc.movs[ev.m])return;
     S.mi=ev.m;S.wait=false;S.running=true;S.started=ev.onset*1000-pc.movs[ev.m][1]*1000;
     S.shift=0;S.cue=firstCueOf(pc,ev.m);S.why="";
-    logEv("mov",ev.m,pc.movs[ev.m][1],1,ev.onset*1000);render();
+    logEv("mov",ev.m,pc.movs[ev.m][1],1,ev.onset*1000);
+    bridge("mov",{day:DATA[S.d].date,piece:S.p,mov:ev.m,name:pc.movs[ev.m][0]});render();
   }else if(ev.e==="wait"||(ev.e==="reanchor"&&ev.m>0)){if(!pc.movs[ev.m])return;
     S.mi=ev.m-1;S.wait=true;render();
   }else if(ev.e==="reanchor"||ev.e==="reset"){
     S.running=false;S.pausedAt=0;S.started=null;S.mi=0;S.wait=false;S.w0=0;logEv("redo",0,0,1);render();
   }else if(ev.e==="end"){
-    S.done=true;S.wait=false;S.hold=false;logEv("end",S.mi,el(),1);S.w0=0;render();
+    S.done=true;S.wait=false;S.hold=false;logEv("end",S.mi,el(),1);S.w0=0;
+    bridge("end",{day:DATA[S.d].date,piece:S.p});render();
     setTimeout(function(){if(S.done&&S.view==="cue"&&S.p<DATA[S.d].pieces.length-1)openPiece(S.p+1,true);},5000);
   }
 }
@@ -1234,6 +1240,9 @@ function fireCue(pc,n,t,why){
   var p=pc.cues[n][0]+S.shift;
   if(why!=="time"&&why!=="mov"){S.shift+=(t-p)*0.6;S.shift=Math.max(-25,Math.min(25,S.shift));}
   S.cue=n;S.why=why==="time"?"予定の時間":(why==="mov"?"":why);
+  bridge("cue",{day:DATA[S.d].date,piece:S.p,mov:S.mi,i:n,t:pc.cues[n][0],
+    target:pc.cues[n][1],names:nameKey(pc.cues[n][1]),shot:pc.cues[n][2],
+    text:pc.cues[n][3],sure:pc.cues[n][5]?1:0,why:S.why});
   logEv("cue",n,Math.round(pc.cues[n][0]),why==="man"?0:1,null,S.why||"楽章の始まり");}
 function cueStep(pc,t){
   if(!micActive()){S.cue=idxAt(pc,t);return;}
