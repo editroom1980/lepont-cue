@@ -793,7 +793,7 @@ var DATA = [
       ]
     },
     {
-      composer:"クルターグ", title:"リガトゥーラ ― フランセス＝マリー・ウィッティへのメッセージ Op.31b",
+      quiet:1, composer:"クルターグ", title:"リガトゥーラ ― フランセス＝マリー・ウィッティへのメッセージ Op.31b",
       players:"チャウシャン(Vc)／プレッサー(Vc)／ロメイコ(Vn)／樫本(Vn)／バックス(Pf)", dur:240,
       memo:"★とても静かで音が少ない。音を長く伸ばして止まる場面や無音の間が多いので、寄ったまま保持する勇気を。演奏中はパンしない。終わっても拍手が来るまで動かさない。",
       mood:"息をひそめる、ほぼ無音の瞑想の音楽。",
@@ -1008,8 +1008,9 @@ function micFeat(db, td, sr, fft) {
 /* 状態の判定（演奏・静か・拍手 → 開始／楽章の間／次の楽章／曲の終わり）。検証: 9/16・9/17の3台分の録音で全楽章の頭を±2秒で検出 */
 function MicSync(pieceMovs, opt) { this.opt = opt || {}; this.setPiece(pieceMovs); this.hist = []; this.lvls = []; this.lastAppl = -1e9; this.armed = false; this.fr = []; }
 MicSync.prototype.P = function (k, v) { return this.opt[k] != null ? this.opt[k] : v; };
-MicSync.prototype.nextPiece = function (movs, t) { this.ignoreAppl = t; this.lastAppl = -1e9; this.setPiece(movs); };
-MicSync.prototype.setPiece = function (movs) { // movs: [{st:planStart, len:planLen, att:bool}]
+MicSync.prototype.nextPiece = function (movs, t, po) { this.ignoreAppl = t; this.lastAppl = -1e9; this.setPiece(movs, po); };
+MicSync.prototype.setPiece = function (movs, po) { // movs: [{st:planStart, len:planLen, att:bool}], po: 曲ごとの設定
+  this.po = po || {};
   this.movs = movs; this.st = "armed"; this.m = 0; this.onset = null; this.cand = null; this.sil0 = null; this.app0 = null; this.wait = false; this.prov = false; };
 MicSync.prototype.emit = function (ev) { if (this.on) this.on(ev); };
 MicSync.prototype.frame = function (f, t) {
@@ -1033,7 +1034,10 @@ MicSync.prototype.frame = function (f, t) {
   if (aDur >= 3 && !(this.ignoreAppl && this.app0 <= this.ignoreAppl)) { this.lastAppl = t; }
   if (!appl && this.ignoreAppl && this.app0 == null && t - (this.appEnd || 0) > 5 && this.appEnd >= this.ignoreAppl) this.ignoreAppl = null;
   // music run (continuous, tolerate <=0.6 s dropouts)
-  if (music) { if (this.run0 == null) this.run0 = t; this.runEnd = t; } else if (this.run0 != null && t - this.runEnd > this.P("drop", 0.6)) this.run0 = null;
+  if (music) { if (this.run0 == null) { this.run0 = t; this.runL = []; }
+    this.runEnd = t; this.runL.push(bmed); if (this.runL.length > 600) this.runL.shift(); }
+  else if (this.run0 != null && t - this.runEnd > this.P("drop", 0.6)) {
+    this.preRun = this.runEnd - this.run0; this.preLv = med(this.runL); this.run0 = null; }
   var runDur = this.run0 != null ? t - this.run0 : 0;
   // silence run (non-music), measured from last music frame
   var silDur = music ? 0 : t - (this.runEnd || t);
@@ -1076,6 +1080,8 @@ MicSync.prototype.change = function (f, t, music) {
   function mean(L) { var o = [], x, y, z; for (x = 0; x < n; x++) { y = 0; for (z = 0; z < L.length; z++) y += Math.pow(10, L[z].v[x] / 10); o.push(10 * Math.log10(y / L.length + 1e-30)); } return o; }
   function lin(v) { var y = 0, x; for (x = 0; x < v.length; x++) y += Math.pow(10, v[x] / 10); return 10 * Math.log10(y + 1e-30); }
 };
+function med(a) { if (!a || !a.length) return -120; var b = a.slice().sort(function (x, y) { return x - y; }); return b[b.length >> 1]; }
+MicSync.prototype.runLv = function () { return med(this.runL); };
 MicSync.prototype.step = function (t, runDur, silDur, aDur) {
   var M = this.movs, last = this.m >= M.length - 1, ON = this.P("onSec", 4);
   if (this.st === "armed") {
@@ -1091,11 +1097,16 @@ MicSync.prototype.step = function (t, runDur, silDur, aDur) {
   if (this.st !== "play") return;
   var e = t - this.onset;
   // provisional start: silence >=3 s within the first 15 s -> re-anchor
-  if (this.prov && e - silDur > Math.min(this.P("provSec", 30), 0.5 * M[this.m].len)) this.prov = false;
-  if (this.prov && silDur >= this.P("provSil", 5)) {
-    this.emit({ e: "reanchor", m: this.m });
-    if (this.m === 0) { this.st = "armed"; } else { this.st = "gap"; }
-    return;
+  if (this.prov && !this.pend && e - silDur > Math.min(this.P("provSec", 60), 0.5 * M[this.m].len)) this.prov = false;
+  if (this.prov && silDur >= this.P("provSil", 5)) this.pend = true;   // 保留（画面はそのまま進める）
+  if (this.prov && this.pend && runDur >= ON) {
+    var louder = this.runLv() >= (this.preLv == null ? -120 : this.preLv) + this.P("reDb", 8);
+    if (!this.po.noRe && (this.preRun < this.P("reRun", 15) || louder)) {   // 短い音合わせだった／本番の方が明らかに大きい
+      this.pend = false; this.emit({ e: "reanchor", m: this.m });
+      if (this.m === 0) { this.st = "armed"; } else { this.st = "gap"; }
+      return;
+    }
+    this.pend = false;   // 曲の中の間だった: そのまま進める
   }
   // applause handling
   var early = this.m === 0 && e < Math.min(0.7 * M[0].len, Math.max(200, 0.5 * M[0].len));
@@ -1127,6 +1138,7 @@ if (typeof module !== "undefined") module.exports = { MicSync: MicSync, gapOdds:
 var MIC={want:true,on:false,busy:false,err:"",ctx:null,an:null,src:null,stream:null,tmr:null,sync:null,fd:null,td:null};
 try{if(localStorage.getItem("lepont26mic")==="0")MIC.want=false;}catch(e){}
 function micActive(){return MIC.on&&!!MIC.sync;}
+function micOpt(pc){return {noRe:!!pc.quiet};}
 function micMovs(pc){var r=[],i,st,en;for(i=0;i<pc.movs.length;i++){st=pc.movs[i][1];
   en=i+1<pc.movs.length?pc.movs[i+1][1]:pc.dur;r.push({st:st,len:Math.max(30,en-st),att:!!pc.movs[i][3]});}return r;}
 function micFail(msg){MIC.busy=false;MIC.err=msg;micStop();paintMic();}
@@ -1145,7 +1157,7 @@ function micStart(){
       src.connect(an);an.connect(g);g.connect(ctx.destination);
       MIC.src=src;MIC.an=an;MIC.fd=new Float32Array(an.frequencyBinCount);MIC.td=new Float32Array(an.fftSize);
     }catch(e){micFail("マイクを開始できません（タップで再試行）");return;}
-    if(!MIC.sync){MIC.sync=new MicSync(micMovs(piece()),{});MIC.sync.on=micEvent;}
+    if(!MIC.sync){MIC.sync=new MicSync(micMovs(piece()),{});MIC.sync.on=micEvent;MIC.sync.po=micOpt(piece());}
     MIC.on=true;micSyncFromApp();
     var tr=stream.getAudioTracks(),i;
     for(i=0;i<tr.length;i++)tr[i].onended=function(){if(MIC.on)micFail("マイクが止まりました（タップで再開）");};
@@ -1667,8 +1679,8 @@ function setDay(i){S.d=i;save();render();window.scrollTo(0,0);}
 function openPiece(j,auto){if(S.w0)logEv("end",S.mi,el());
   S.p=j;S.view="cue";S.started=null;S.pausedAt=0;S.running=false;S.mi=0;S.wait=false;S.pw=false;S.w0=0;
   S.done=false;S.hold=false;S.pk=-1;S.pmv=0;S.flash=0;S.fl=false;S.cue=0;S.shift=0;S.why="";
-  if(MIC.sync){if(auto)MIC.sync.nextPiece(micMovs(piece()),Date.now()/1000);
-    else{MIC.sync.setPiece(micMovs(piece()));micSyncFromApp();}}
+  if(MIC.sync){if(auto)MIC.sync.nextPiece(micMovs(piece()),Date.now()/1000,micOpt(piece()));
+    else{MIC.sync.setPiece(micMovs(piece()),micOpt(piece()));micSyncFromApp();}}
   if(MIC.want&&!MIC.on&&!MIC.busy&&!auto)micStart();
   render();window.scrollTo(0,0);}
 function goHome(){if(S.w0){logEv("end",S.mi,el());S.w0=0;}S.view="home";S.running=false;S.done=false;unlockScreen();render();window.scrollTo(0,0);}
