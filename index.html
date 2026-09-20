@@ -1147,6 +1147,9 @@ function micMovs(pc){var r=[],i,st,en;for(i=0;i<pc.movs.length;i++){st=pc.movs[i
 function micFail(msg){MIC.busy=false;MIC.err=msg;micStop();paintMic();}
 function micStart(){
   if(MIC.on||MIC.busy)return;
+  if(window.__NATIVE__){ // ジンバルアプリの中: 音の特徴はアプリから届く
+    if(!MIC.sync){MIC.sync=new MicSync(micMovs(piece()),{});MIC.sync.on=micEvent;MIC.sync.po=micOpt(piece());}
+    MIC.on=true;MIC.err="";micSyncFromApp();render();return;}
   var AC=window.AudioContext||window.webkitAudioContext,pr;
   if(!AC||!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){micFail("この端末ではマイクが使えません（手動で操作）");return;}
   MIC.busy=true;MIC.err="";paintMic();
@@ -1234,8 +1237,8 @@ function firstCueOf(pc,m){var st=pc.movs[m][1],k;
   return pc.cues.length-1;}
 function cueWin(pc,n){ // n番目のキューの「待ち受け幅」
   var p=pc.cues[n][0]+S.shift,pv=n>0?pc.cues[n-1][0]+S.shift:p-60,
-    nx=pc.cues[n+1]?pc.cues[n+1][0]+S.shift:p+60,w=0.4*Math.min(p-pv,nx-p);
-  return Math.max(6,Math.min(40,w));}
+    nx=pc.cues[n+1]?pc.cues[n+1][0]+S.shift:p+60,w=0.45*Math.min(p-pv,nx-p);
+  return Math.max(8,Math.min(40,w));}
 function fireCue(pc,n,t,why){
   var p=pc.cues[n][0]+S.shift;
   if(why!=="time"&&why!=="mov"){S.shift+=(t-p)*0.6;S.shift=Math.max(-25,Math.min(25,S.shift));}
@@ -1254,7 +1257,7 @@ function cueStep(pc,t){
   var p=pc.cues[n][0]+S.shift,w=cueWin(pc,n),thr;
   if(t<p-0.6*w)return;
   if(t>=p+0.3*w){fireCue(pc,n,t,"time");return;}   // 変化が無ければ予定より少しだけ待って出す
-  thr=t<=p?2.4+(1.8-2.4)*(t-(p-0.6*w))/(0.6*w):1.8+(1.4-1.8)*((t-p)/(0.3*w));
+  thr=t<=p?2.1+(1.5-2.1)*(t-(p-0.6*w))/(0.6*w):1.5+(1.15-1.5)*((t-p)/(0.3*w));
   if(MIC.sync.chg>=thr)fireCue(pc,n,t,MIC.sync.kind||"音が変わった");}
 /* ---------- カメラ設定の画面 ---------- */
 function camOpt(list,cur){var h="",i;for(i=0;i<list.length;i++)
@@ -1301,10 +1304,18 @@ function camPasteIn(){var t=prompt("コピーした設定の文字を貼り付�
   try{var d=JSON.parse(t);if(!d.cams||!d.cams.length)throw 0;CAM.cams=d.cams;CAM.me=d.me||0;
     document.getElementById("camf").innerHTML=camForm();}catch(e){alert("読み取れませんでした");}}
 function closeCam(){var o=document.getElementById("camv");if(o)o.parentNode.removeChild(o);}
+/* ジンバルアプリから音の特徴を受け取る（1秒に10回） */
+window.micFeedNative=function(a){
+  try{ if(!MIC.on||!MIC.sync)return;
+    MIC.sync.hold=(S.view!=="cue")||(!S.running&&S.pausedAt>0&&!S.wait&&!S.done);
+    MIC.sync.frame({lvl:a[0],b1:a[1],b2:a[2],b3:a[3],flat:a[4],ton:a[5],sp:a.slice(6,16)},Date.now()/1000);
+    paintMicLive();
+  }catch(e){}};
 function micWord(){var y=MIC.sync;if(!y||y.lvl==null)return "…";return y.appl?"拍手":(y.music?"演奏の音":"静か");}
 function micLv(){var y=MIC.sync;if(!y||y.lvl==null||y.floor==null)return 0;return Math.max(0,Math.min(100,(y.lvl-y.floor)*2.5));}
 function micInner(){
-  if(MIC.on)return '<span class="mk on">\uD83C\uDFA4</span><span class="ms" id="mic_s">自動合わせ中｜'+micWord()+
+  if(MIC.on)return '<span class="mk on">\uD83C\uDFA4</span><span class="ms" id="mic_s">'+
+    (window.__NATIVE__?"アプリから受信中｜":"自動合わせ中｜")+micWord()+
     '</span><i class="lv"><b id="mic_l" style="width:'+micLv()+'%"></b></i>';
   if(MIC.busy)return '<span class="mk">\uD83C\uDFA4</span><span class="ms">マイクを準備中…「許可」を押してください</span>';
   if(MIC.err)return '<span class="mk ng">\uD83C\uDFA4</span><span class="ms">'+esc(MIC.err)+'</span>';
@@ -1313,7 +1324,8 @@ function micInner(){
 function micHTML(){return '<button class="mic" id="mic" onclick="micToggle()">'+micInner()+'</button>';}
 function paintMic(){var e=document.getElementById("mic");if(e)e.innerHTML=micInner();}
 function paintMicLive(){var s=document.getElementById("mic_s"),l=document.getElementById("mic_l");
-  if(s)s.textContent="自動合わせ中｜"+micWord();if(l)l.style.width=micLv()+"%";}
+  if(s)s.textContent=(window.__NATIVE__?"アプリから受信中｜":"自動合わせ中｜")+micWord();
+  if(l)l.style.width=micLv()+"%";}
 document.addEventListener("visibilitychange",function(){
   if(document.visibilityState==="visible"&&MIC.on&&MIC.ctx){try{MIC.ctx.resume();}catch(e){}}});
 function stInfo(){
@@ -1690,7 +1702,9 @@ function openPiece(j,auto){if(S.w0)logEv("end",S.mi,el());
   S.done=false;S.hold=false;S.pk=-1;S.pmv=0;S.flash=0;S.fl=false;S.cue=0;S.shift=0;S.why="";
   if(MIC.sync){if(auto)MIC.sync.nextPiece(micMovs(piece()),Date.now()/1000,micOpt(piece()));
     else{MIC.sync.setPiece(micMovs(piece()),micOpt(piece()));micSyncFromApp();}}
-  if(MIC.want&&!MIC.on&&!MIC.busy&&!auto)micStart();
+  if(MIC.want&&!MIC.on&&!MIC.busy)micStart();
+  bridge("piece",{day:DATA[S.d].date,piece:S.p,title:piece().title,
+    players:roster(piece()).map(function(r){return {name:r.name,inst:r.inst};})});
   render();window.scrollTo(0,0);}
 function goHome(){if(S.w0){logEv("end",S.mi,el());S.w0=0;}S.view="home";S.running=false;S.done=false;unlockScreen();render();window.scrollTo(0,0);}
 function toggleDim(){S.dim=!S.dim;save();document.body.className=S.dim?"dim":"";
