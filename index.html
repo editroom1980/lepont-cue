@@ -272,6 +272,18 @@ button{font-family:inherit;color:inherit;border:none;background:none;cursor:poin
   border-radius:8px;padding:8px;box-sizing:border-box;font-family:monospace}
 .logv .row{display:-webkit-flex;display:flex;margin-top:10px}
 .logv .row > * + *{margin-left:8px}
+.camf{-webkit-flex:1;flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+.cbox{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin:8px 0;background:var(--panel)}
+.cbox .cn{font-size:13px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.cr{display:-webkit-flex;display:flex;-webkit-align-items:center;align-items:center;margin:5px 0}
+.cr label{-webkit-flex:0 0 66px;flex:0 0 66px;font-size:12px;color:var(--sub)}
+.cr input,.cr select{-webkit-flex:1;flex:1;min-width:0;font-size:14px;background:#15151b;color:var(--txt);
+  border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-family:inherit;-webkit-appearance:none;appearance:none}
+.camline{margin:0 12px 8px;padding:6px 10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);
+  font-size:12px;color:var(--sub);line-height:1.5}
+.camline b{color:var(--txt)}
+.top-row .camchip{-webkit-flex:0 0 auto;flex:0 0 auto;font-size:12px;font-weight:800;color:#000;background:var(--accent);
+  border-radius:6px;padding:2px 7px}
 </style>
 </head>
 <body>
@@ -932,6 +944,37 @@ function movOf(pc,t){var n=pc.movs[0][0];
 function idxAt(pc,t){var ci=-1;
   for(var i=0;i<pc.cues.length;i++){if(pc.cues[i][0]<=t)ci=i;}return ci;}
 
+/* ---------- カメラを分ける（複数台） ---------- */
+var CAM={me:0,cams:[]};
+try{var _cs=localStorage.getItem("lepont26cam");if(_cs){var _co=JSON.parse(_cs);
+  if(_co&&_co.cams&&_co.cams.length>1){CAM.cams=_co.cams;CAM.me=_co.me||0;}}}catch(e){}
+function camOn(){return CAM.cams.length>1;}
+function camMe(){return camOn()?CAM.cams[Math.min(CAM.me,CAM.cams.length-1)]:null;}
+function camRole(){var c=camMe();return c?(c.role||"main"):"main";}
+function camLtr(i){return String.fromCharCode(65+i);}
+function camSave(){try{localStorage.setItem("lepont26cam",JSON.stringify(CAM));}catch(e){}}
+function nameKey(t){var a=String(t).split(/[\uFF0B\u2192]/),o=[],i,m;
+  for(i=0;i<a.length;i++){m=a[i].match(/^\s*(.+?)\(/);if(m)o.push(m[1]);}
+  return o.join(",");}
+function subCue(pc,ci){ // 別の人を追うカメラ用: 主カメと重ならない対象を選ぶ
+  var mc=pc.cues[ci],mk=nameKey(mc[1]),k,c,kk;
+  for(k=ci+1;k<pc.cues.length;k++){c=pc.cues[k];kk=nameKey(c[1]);
+    if(kk&&kk!==mk)return {t:c[1],s:mc[2]==="WS"?"US":"BS",x:"次に出る人を先に押さえる",n:c[3]};}
+  for(k=ci-1;k>=0;k--){c=pc.cues[k];kk=nameKey(c[1]);
+    if(kk&&kk!==mk)return {t:c[1],s:"BS",x:"主カメと別の人を押さえる",n:c[3]};}
+  return {t:"全員",s:"WS",x:"主カメと重ならないよう引きで",n:"全員を引きで"};}
+function camOther(pc,ci){ // 他のカメラが今どこを狙っているか
+  var h=[],i,c,sc;
+  for(i=0;i<CAM.cams.length;i++){ if(i===CAM.me)continue; c=CAM.cams[i];
+    if((c.role||"main")==="zen")h.push("<b>"+camLtr(i)+"</b> 全体（固定）");
+    else if((c.role||"main")==="sub"){sc=subCue(pc,ci);h.push("<b>"+camLtr(i)+"</b> "+esc(whoInline(sc.t))+"（"+shotJa(sc.s)+"）");}
+    else h.push("<b>"+camLtr(i)+"</b> "+esc(whoInline(pc.cues[ci][1]))+"（"+shotJa(pc.cues[ci][2])+"）");}
+  return h.length?'<div class="camline" id="caml">他のカメラ　'+h.join("　／　")+'</div>':"";}
+function zenHTML(pc){var ro=roster(pc);
+  return '<div class="now ws" id="now"><div class="hd"><span class="shot ws">引き</span>'+
+    '<span class="at">固定・全体</span></div><div class="who">'+ro.length+'人が入る画角に</div>'+
+    stripHTML(ro)+'<div class="nt">曲が変わったら人数と並びを見て画角を合わせ直す。演奏中は動かさない。</div></div>';}
+
 /* マイクで自動合わせ：音の特徴（AnalyserNode のデータから） */
 if(!Math.log10)Math.log10=function(x){return Math.log(x)/Math.LN10;};
 function micFeat(db, td, sr, fft) {
@@ -1192,6 +1235,51 @@ function cueStep(pc,t){
   if(t>=p+0.3*w){fireCue(pc,n,t,"time");return;}   // 変化が無ければ予定より少しだけ待って出す
   thr=t<=p?2.4+(1.8-2.4)*(t-(p-0.6*w))/(0.6*w):1.8+(1.4-1.8)*((t-p)/(0.3*w));
   if(MIC.sync.chg>=thr)fireCue(pc,n,t,MIC.sync.kind||"音が変わった");}
+/* ---------- カメラ設定の画面 ---------- */
+function camOpt(list,cur){var h="",i;for(i=0;i<list.length;i++)
+  h+='<option value="'+list[i][0]+'"'+(list[i][0]===cur?" selected":"")+'>'+list[i][1]+'</option>';return h;}
+function camForm(){
+  var n=CAM.cams.length||1,h="",i,c;
+  h+='<div class="cr"><label>台数</label><select id="cam_n" onchange="camCount(this.value)">';
+  for(i=1;i<=4;i++)h+='<option value="'+i+'"'+(i===n?" selected":"")+'>'+i+'台</option>';
+  h+='</select></div>';
+  for(i=0;i<n;i++){c=CAM.cams[i]||{};
+    h+='<div class="cbox"><div class="cn">'+camLtr(i)+'カメ</div>'+
+      '<div class="cr"><label>機種</label><input id="cm_'+i+'" value="'+esc(c.model||"")+'" placeholder="FX6 / iPhone16Pro など"></div>'+
+      '<div class="cr"><label>レンズ</label><input id="cl_'+i+'" value="'+esc(c.lens||"")+'" placeholder="50-400mm など"></div>'+
+      '<div class="cr"><label>位置</label><input id="cp_'+i+'" value="'+esc(c.pos||"")+'" placeholder="中央後方 など"></div>'+
+      '<div class="cr"><label>撮り方</label><select id="cr_'+i+'">'+
+      camOpt([["main","指示どおりに寄る（人が操作）"],["sub","別の人を狙う（人が操作）"],["zen","全体・固定"]],c.role||(i===0?"zen":"main"))+
+      '</select></div></div>';}
+  h+='<div class="cr"><label>この端末</label><select id="cam_me">';
+  for(i=0;i<n;i++)h+='<option value="'+i+'"'+(i===CAM.me?" selected":"")+'>'+camLtr(i)+'カメ</option>';
+  h+='</select></div>';
+  return h;}
+function camRead(){var n=+document.getElementById("cam_n").value,a=[],i,g=function(id){var e=document.getElementById(id);return e?e.value:"";};
+  for(i=0;i<n;i++)a.push({n:camLtr(i),model:g("cm_"+i),lens:g("cl_"+i),pos:g("cp_"+i),role:g("cr_"+i)||"main"});
+  return {cams:a,me:Math.min(+g("cam_me")||0,n-1)};}
+function camCount(v){var d=camRead(),n=+v,i;
+  while(d.cams.length<n)d.cams.push({n:camLtr(d.cams.length),role:"main"});
+  d.cams.length=n;CAM.cams=d.cams;CAM.me=Math.min(d.me,n-1);
+  document.getElementById("camf").innerHTML=camForm();}
+function camSetup(){var o=document.createElement("div");o.className="logv";o.id="camv";
+  o.innerHTML='<b style="color:var(--accent);font-size:15px">カメラ設定</b>'+
+    '<div class="lg">何台で撮るか、この端末がどのカメラかを決めます。1台のままなら今までどおり全部の指示が出ます。</div>'+
+    '<div class="camf" id="camf">'+camForm()+'</div>'+
+    '<div class="row"><button class="btn key" onclick="camApply()">保存</button>'+
+    '<button class="btn sm" onclick="camCopy()">設定をコピー</button>'+
+    '<button class="btn sm" onclick="camPasteIn()">貼り付け</button>'+
+    '<button class="btn" onclick="closeCam()">閉じる</button></div>';
+  document.body.appendChild(o);}
+function camApply(){var d=camRead();CAM.cams=d.cams.length>1?d.cams:[];CAM.me=d.me;camSave();closeCam();render();}
+function camCopy(){var d=camRead(),t=JSON.stringify(d);
+  try{if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(
+    function(){alert("コピーしました。他のiPhoneで［貼り付け］を押して入れてください");},function(){prompt("この文字をコピーしてください",t);});return;}}catch(e){}
+  prompt("この文字をコピーしてください",t);}
+function camPasteIn(){var t=prompt("コピーした設定の文字を貼り付けてください","");if(!t)return;
+  try{var d=JSON.parse(t);if(!d.cams||!d.cams.length)throw 0;CAM.cams=d.cams;CAM.me=d.me||0;
+    document.getElementById("camf").innerHTML=camForm();}catch(e){alert("読み取れませんでした");}}
+function closeCam(){var o=document.getElementById("camv");if(o)o.parentNode.removeChild(o);}
 function micWord(){var y=MIC.sync;if(!y||y.lvl==null)return "…";return y.appl?"拍手":(y.music?"演奏の音":"静か");}
 function micLv(){var y=MIC.sync;if(!y||y.lvl==null||y.floor==null)return 0;return Math.max(0,Math.min(100,(y.lvl-y.floor)*2.5));}
 function micInner(){
@@ -1291,6 +1379,14 @@ function home(){
     '</div><div class="ri">'+esc(dr[r].inst)+'</div><div class="rf">'+esc(FULLNAME[dr[r].name]||"")+'</div></div>';
   h+='</div><div class="credit">写真：ル・ポン国際音楽祭 公式サイトより</div>';
   h+='<div class="sect">実測の記録</div><button class="btn sm logb" onclick="showLog()">記録を見る・コピー（'+logCount()+'件）</button>';
+  h+='<div class="sect">カメラ設定</div>';
+  if(camOn()){var ci2,cc;h+='<div class="rig">';
+    for(ci2=0;ci2<CAM.cams.length;ci2++){cc=CAM.cams[ci2];
+      h+='<div class="r"><b>'+camLtr(ci2)+'カメ'+(ci2===CAM.me?'（この端末）':'')+'／'+esc(cc.model||"")+'</b><div>'+
+        esc([cc.lens,cc.pos].join(" ").replace(/^ | $/g,""))+'　'+
+        ((cc.role||"main")==="zen"?"全体・固定":((cc.role||"main")==="sub"?"別の人を狙う":"指示どおりに寄る"))+'</div></div>';}
+    h+='</div>';}
+  h+='<button class="btn sm logb" onclick="camSetup()">'+(camOn()?'カメラ設定を変える（'+CAM.cams.length+'台）':'カメラを分ける設定（今は1台）')+'</button>';
   h+='<div class="sect">カメラ配置メモ</div><div class="rig">'+
      '<div class="r"><b>A／iPhone16Pro</b><div>舞台左・固定・広角。客席込みで会場を広く。開演前から回して止めない。</div></div>'+
      '<div class="r"><b>B／FX3</b><div>固定・100mm前後。演奏者全体が収まる画角。曲ごとに人数が変わるので、曲の間に上の曲目欄の顔ぶれを見て画角を合わせ直す。</div></div>'+
@@ -1432,6 +1528,18 @@ function nowHTML(pc,ci){
     '<div class="nt">'+esc(c[3])+'</div>'+
     (c[4]?'<div class="why"><b>なぜ</b>'+esc(c[4])+'<span class="src'+(c[5]?' ok':'')+'">'+(c[5]?'資料あり':'目安')+'</span></div>':'')+'</div>';
 }
+function subNowHTML(pc,ci){ // 「別の人を狙う」カメラの画面
+  if(S.done||ci<0)return nowHTML(pc,ci);
+  var sc=subCue(pc,ci),k=sc.s==="US"?"us":(sc.s==="BS"?"bs":"ws"),body,p,j;
+  if(allNamed(sc.t)){p=whoParts(sc.t);body='<div class="ppl">';
+    for(j=0;j<p.length;j++){if(p[j].sep){body+='<div class="sep">\u2193 続けてこちらへ</div>';continue;}
+      body+='<div class="p1">'+face(p[j].name)+'<div class="pt"><div class="nm">'+esc(p[j].name)+
+        '</div><div class="in">'+esc(p[j].inst||"")+'</div></div></div>';}
+    body+='</div>';}
+  else body='<div class="who">'+esc(whoBig(sc.t))+'</div>'+stripHTML(targetPeople(pc,sc.t));
+  return '<div class="now '+k+'" id="now"><div class="hd"><span class="shot '+k+'">'+shotJa(sc.s)+'</span>'+
+    '<span class="at">主カメと別の人</span>'+(micActive()&&S.why?'<span class="cz">'+esc(S.why)+'</span>':"")+'</div>'+body+
+    '<div class="nt">'+esc(sc.n||"")+'</div><div class="why"><b>なぜ</b>'+esc(sc.x)+'</div></div>';}
 function nextHTML(pc,ci,t){
   if(S.done)return '<div class="next" id="nx"><div class="cd" id="cd">終</div>'+
     '<div class="tx"><b>拍手の間も回し続ける</b><span>次の曲は自動で待ち受けます</span></div></div>';
@@ -1443,7 +1551,10 @@ function nextHTML(pc,ci,t){
       '<span>'+(ma?'ずれた時は［次の楽章］で直せます':'楽章の間はタイマーを自動で止めています')+'</span></div></div>';}
   if(S.hold)return '<div class="next" id="nx"><div class="cd" id="cd">…</div>'+
     '<div class="tx"><b>この楽章がまだ続いています</b><span>終わると自動で次の楽章へ進みます</span></div></div>';
-  var n=pc.cues[ci+1];
+  if(camRole()==="zen")return '<div class="next" id="nx"><div class="cd" id="cd">—</div>'+
+    '<div class="tx"><b>固定のまま</b><span>曲が終わるまで動かさない。曲の間に次の人数を確認</span></div></div>';
+  var n=pc.cues[ci+1],s2;
+  if(n&&camRole()==="sub"){s2=subCue(pc,ci+1);n=[n[0],s2.t,s2.s,s2.n,s2.x];}
   if(!n)return '<div class="next" id="nx"><div class="cd" id="cd">終</div>'+
     '<div class="tx"><b>最後のキューです</b><span>拍手が終わるまで回し続ける</span></div></div>';
   var left=n[0]+(micActive()?S.shift:0)-t,soon=micActive()&&left<=0.6*cueWin(pc,ci+1);
@@ -1479,6 +1590,7 @@ function cuepage(){
   var pc=piece(),t=el();cueStep(pc,t);var ci=curCue(pc,t);S.ci=ci;
   var h='<div class="cuepage"><div class="top"><div class="top-row">'+
     '<button class="back" onclick="goHome()">‹ 曲目</button>'+
+    (camOn()?'<span class="camchip">'+camLtr(CAM.me)+'</span>':"")+
     '<div class="top-title">'+(S.p+1)+'. '+esc(pc.title)+'</div>'+
     '<button class="iconbtn'+(S.list?" on":"")+'" onclick="toggleList()">一覧</button>'+
     '<button class="iconbtn'+(S.dim?" on":"")+'" onclick="toggleDim()">暗</button></div></div>'+
@@ -1489,7 +1601,9 @@ function cuepage(){
     '<div class="st'+stInfo()[0]+'" id="st">'+stInfo()[1]+'</div></div>'+
     barHTML(pc,t)+micHTML()+
     (!S.running&&S.pausedAt===0?lineupHTML(pc):"")+
-    nowHTML(pc,ci)+nextHTML(pc,ci,t)+(S.list?listHTML(pc,ci):upHTML(pc,ci))+
+    (camRole()==="zen"?zenHTML(pc)+nextHTML(pc,ci,t):
+      (camRole()==="sub"?subNowHTML(pc,ci)+nextHTML(pc,ci,t):nowHTML(pc,ci)+nextHTML(pc,ci,t))+camOther(pc,ci))+
+    (camRole()==="zen"?"":(S.list?listHTML(pc,ci):upHTML(pc,ci)))+
     '<div class="ctl"><div class="row">'+
     '<button class="btn sm" onclick="reset()">0に戻す</button>'+
     '<button class="btn sm" onclick="nudge(-5)">−5秒</button>'+
@@ -1523,8 +1637,9 @@ function tick(){
   else if(S.fl&&Date.now()>S.flash){S.fl=false;var ml2=g("mvl");if(ml2)ml2.outerHTML=mvlHTML(pc,t);}
   if(ci!==S.ci){
     var old=S.ci;S.ci=ci;
-    g("now").outerHTML=nowHTML(pc,ci);
+    g("now").outerHTML=camRole()==="zen"?zenHTML(pc):(camRole()==="sub"?subNowHTML(pc,ci):nowHTML(pc,ci));
     g("nx").outerHTML=nextHTML(pc,ci,t);
+    var co=g("caml");if(co)co.outerHTML=camOther(pc,ci);
     if(!S.list){var u=g("up");if(u)u.outerHTML=upHTML(pc,ci);}
     if(S.list){
       for(var k=0;k<pc.cues.length;k++){
